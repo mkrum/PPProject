@@ -1,7 +1,7 @@
 import pygame
 import sys
 from snake import Snake
-from gamegrid import Grid
+from gamegrid import Grid, Box
 
 class GameSpace:
 
@@ -12,9 +12,11 @@ class GameSpace:
         self.black = 0, 0, 0 #RGB
         self.screen = pygame.display.set_mode(self.size)
 
+        self.box_size = 10
+
         # part two
-        self.player = Snake(self, 0, 0)
-        self.grid = Grid(self, 60, 60)
+        self.player = Snake(self, 0, 0, self.box_size)
+        self.grid = Grid(self, self.width/self.box_size, self.height/self.box_size)
         self.clock = pygame.time.Clock()
 
         # part three
@@ -22,6 +24,7 @@ class GameSpace:
 
             self.clock.tick(60)
 
+            self.grid.tick(self)#, self.player)
             self.player.tick(self)
 
             for event in pygame.event.get():
@@ -45,12 +48,17 @@ class GameSpace:
             self.screen.fill(self.black)
             pygame.draw.rect(self.screen, (0, 255, 0), self.player.rect)
 
-            for i in range(60):
-                for j in range(60):
-                    pygame.draw.rect(self.screen, (255, 0, 0), self.grid.boxes[i][j])
+            for i in range(self.width/self.box_size):
+                for j in range(self.height/self.box_size):
+
+                    if (self.grid.data[i][j] == Box.MARKED):
+                        pygame.draw.rect(self.screen, (255, 0, 0), self.grid.boxes[i][j])
+                    elif (self.grid.data[i][j] == Box.PATH):
+                        pygame.draw.rect(self.screen, ((255/2), 0, 0), self.grid.boxes[i][j])
+                    elif (self.grid.data[i][j] == Box.EMPTY):
+                        pygame.draw.rect(self.screen, (0, 0, 255), self.grid.boxes[i][j])
 
             pygame.draw.rect(self.screen, (0, 255, 0), self.player.rect)
-
             pygame.display.flip()
 
 
