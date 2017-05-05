@@ -10,13 +10,12 @@ class Box():
 class Grid(pygame.sprite.Sprite):
 
     def __init__(self, gs, N_wide, N_height):
-        self.width = N_wide
-        self.height = N_height
+        self.width = int(N_wide)
+        self.height = int(N_height)
         self.box_width = gs.width / N_wide
         self.box_height = gs.height / N_height
-        
-        self.boxes = [ [] for _ in xrange(N_height) ]
-        self.data = [ [] for _ in xrange(N_height) ]
+        self.boxes = [ [] for _ in range(self.width) ]
+        self.data = [ [] for _ in range(self.height) ]
 
         self.snake_path = []
         

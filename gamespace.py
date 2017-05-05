@@ -31,7 +31,7 @@ class GameSpace:
                 if event.type == pygame.QUIT:
                     sys.exit(1)
 
-                if event.type == pygame.KEYDOWN:
+                if event.type == pygame.KEYDOWN: 
                     if event.key == ord("s"):
                         self.player.move_down()
 
@@ -48,8 +48,8 @@ class GameSpace:
             self.screen.fill(self.black)
             pygame.draw.rect(self.screen, (0, 255, 0), self.player.rect)
 
-            for i in range(self.width/self.box_size):
-                for j in range(self.height/self.box_size):
+            for i in range(self.width // self.box_size):
+                for j in range(self.height // self.box_size):
 
                     if (self.grid.data[i][j] == Box.MARKED):
                         pygame.draw.rect(self.screen, (255, 0, 0), self.grid.boxes[i][j])
