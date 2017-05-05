@@ -2,6 +2,7 @@ import pygame
 import sys
 from snake import Snake
 from gamegrid import Grid, Box
+from connection import Connection
 
 class GameSpace:
 
@@ -32,7 +33,7 @@ class GameSpace:
         # part two
         self.player = Snake(self, 0, 0, self.box_size)
         self.grid = Grid(self, self.grid_size, self.grid_size)
-        self.connection(self.grid)
+        self.connection = Connection(self.grid)
         self.clock = pygame.time.Clock()
 
         # part three

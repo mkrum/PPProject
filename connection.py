@@ -1,6 +1,6 @@
 
 import pygame
-from twisted.internet.protocol import Factory, Protocol
+from twisted.internet.protocol import ClientFactory, Protocol
 from twisted.internet import reactor
 
 
@@ -9,14 +9,18 @@ class Connection():
     def __init__(self, grid):
         self.grid = grid
         reactor.connectTCP("ash.campus.nd.edu", 40067, self.createClientCon())
+        reactor.run()
+        print("connect")
 
     def createClientCon(self):
-        cf = ClientFactory()
+        cf = clientFactory()
         self.connection = cf.myconn
         return cf
 
     def update(self, i, j, value):
-        self.connection.transport.write("%s %s %s" % (str(i), str(j), str(value)))
+        #just for now
+        if self.connection.ready:
+            self.connection.transport.write("%s %s %s" % (str(i), str(j), str(value)))
 
 
 #Client
@@ -31,16 +35,11 @@ class ClientConnection(Protocol):
         self.data_connection.service_connection = self
         return data_factory
 
-    def dataReceived(self, data):
-        self.queue.put(data)
-
-    def q_callback(self, data):
-        self.data_connection.transport.write(data)
-        self.queue.get().addCallback(self.q_callback)
 
 
 
-class ClientFactory(Factory):
+
+class clientFactory(ClientFactory):
     def __init__(self):
         self.myconn = ClientConnection()
         self.myconn.ready = False
