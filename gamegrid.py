@@ -12,20 +12,15 @@ class Grid(pygame.sprite.Sprite):
     def __init__(self, gs, N_wide, N_height):
         self.width = N_wide
         self.height = N_height
-        self.box_width = gs.width / N_wide
-        self.box_height = gs.height / N_height
+        self.box_width = gs.box_size
+        self.box_height = gs.box_size
         
-        self.boxes = [ [] for _ in xrange(N_height) ]
         self.data = [ [] for _ in xrange(N_height) ]
 
         self.snake_path = []
         
         for i in range(self.height):
-            y = i * self.box_height
             for j in range(self.width):
-                x = j * self.box_width
-                self.boxes[i].append(pygame.Rect(x, y, self.box_width, self.box_height))
-
                 #placeholder
                 self.data[i].append(Box.EMPTY)
                 if(i + j < 3):
@@ -35,18 +30,17 @@ class Grid(pygame.sprite.Sprite):
 
     def tick(self, gs):
         #mark the spot of the current snake
-        for i in range(self.height):
-            for j in range(self.width):
-                if (self.boxes[i][j].colliderect(gs.player.rect)):
-                    if(self.data[i][j] == Box.MARKED):
-                        self.snake_path.append([i, j])
-                        if (len(self.snake_path) > 1):
-                            self.fill_path()
-                        self.snake_path = []
-                    else:
-                        self.data[i][j] = Box.PATH
-                        self.snake_path.append([i, j])
-                    break
+        i = gs.player.x
+        j = gs.player.y
+
+        if(self.data[i][j] == Box.MARKED):
+            self.snake_path.append([i, j])
+            if (len(self.snake_path) > 1):
+                self.fill_path()
+            self.snake_path = []
+        else:
+            self.data[i][j] = Box.PATH
+            self.snake_path.append([i, j])
 
 
 
