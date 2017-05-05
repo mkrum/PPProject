@@ -203,4 +203,3 @@ class Grid(pygame.sprite.Sprite):
             
             for adj in self.get_valid_edges(current, visited, Box.EMPTY):
                 q.put(adj)
-

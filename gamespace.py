@@ -47,7 +47,7 @@ class GameSpace:
                 if event.type == pygame.QUIT:
                     sys.exit(1)
 
-                if event.type == pygame.KEYDOWN:
+                if event.type == pygame.KEYDOWN: 
                     if event.key == ord("s"):
                         self.player.move_down()
 
