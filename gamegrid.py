@@ -40,6 +40,7 @@ class Grid(pygame.sprite.Sprite):
             self.snake_path = []
         else:
             self.data[i][j] = Box.PATH
+            gs.connection.update(i, j, Box.PATH)
             self.snake_path.append([i, j])
 
 
@@ -73,6 +74,7 @@ class Grid(pygame.sprite.Sprite):
 
         for (i, j) in self.snake_path:
             self.data[i][j] = Box.MARKED
+            gs.connection.update(i, j, Box.MARKED)
 
             try:
                 self.i_ranges[i].append(j)
@@ -200,6 +202,7 @@ class Grid(pygame.sprite.Sprite):
         while not q.empty():
             current = q.get()
             self.data[current[0]][current[1]] = Box.MARKED
+            gs.connection.update(current[0], current[1], Box.MARKED)
             
             for adj in self.get_valid_edges(current, visited, Box.EMPTY):
                 q.put(adj)
