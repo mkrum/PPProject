@@ -41,12 +41,13 @@ class ClientConnection(Protocol):
     
     def dataReceived(self, data):
         if data == 'start the game':
+            print('starting game')
             self.gs.started = True
         elif self.gs.started:
             print('data: {}'.format(data))
 
     def update(self, i, j, value):
-        self.transport.write('{} {} [}'.format(i, j, value))
+        self.transport.write('{} {} {}'.format(i, j, value))
 
     #def dataReceived(self, data):
     #    # print('home client connection got data: {}'.format(data))
