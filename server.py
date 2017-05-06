@@ -26,11 +26,9 @@ class ClientConnection(Protocol):
         if not self.conns:
             # first client connection
             self.num = 0
-            self.transport.write('you are player 0\n')
         else:
             # second client connection
             self.num = 1
-            self.transport.write('you are player 1\n')
 
         print('player {} connected'.format(self.num))
         self.conns.append(self)
