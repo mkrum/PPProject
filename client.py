@@ -47,7 +47,8 @@ class ClientConnection(Protocol):
             print('data: {}'.format(data))
 
     def update(self, i, j, value):
-        self.transport.write('{} {} {}'.format(i, j, value))
+        pass
+        #self.transport.write('{} {} {}'.format(i, j, value))
 
     #def dataReceived(self, data):
     #    # print('home client connection got data: {}'.format(data))
@@ -75,5 +76,5 @@ if __name__ == '__main__':
     gs_tick.start((1.0/60.0)).addErrback(log.err)
 
     clientConnFactory = ClientConnectionFactory(gs)
-    reactor.connectTCP("ash.campus.nd.edu", 40067, clientConnFactory)
+    #reactor.connectTCP("newt.campus.nd.edu", 40067, clientConnFactory)
     reactor.run()
