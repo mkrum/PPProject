@@ -8,6 +8,7 @@ class Snake(pygame.sprite.Sprite):
         self.x = x
         self.y = y
         self.size = size
+        self.score = 0
 
         self.speed = size
         self.x_modifier = self.speed
