@@ -18,13 +18,15 @@ class Snake(pygame.sprite.Sprite):
         self.speed = 1
         self.x_modifier = self.speed
         self.y_modifier = 0
+        self.sync = False
    
     def tick(self, gs):
         #update position
         if (self.delay == 0):
             self.x += self.y_modifier 
             self.y += self.x_modifier
-            self.send_location(self.x, self.y)
+            if self.sync:
+                self.send_location(self.x, self.y)
 
         self.delay = (self.delay + 1) % self.pause
 
@@ -77,6 +79,5 @@ class Snake(pygame.sprite.Sprite):
         self.gs.connection.update("%s %s" % (str(i), str(j)))
         
     def receive_location(self, loc):
-        spl = loc.split(" ")
-        self.x = int(spl[0])
+        print("~"+loc+"~")
         self.y = int(spl[1])

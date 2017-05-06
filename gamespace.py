@@ -55,12 +55,14 @@ class GameSpace:
             pygame.display.flip()
 
     def set_players(self, num):
-        if (num):
+        if (int(num)):
             self.player = Snake(self, 0, 0, self.box_size)
             self.opponent = Snake(self, 10, 10, self.box_size)
         else:
             self.player = Snake(self, 10, 10, self.box_size)
             self.opponent = Snake(self, 0, 0, self.box_size)
+
+        self.player.sync = True
 
     def game_space_tick(self):
         # part three
