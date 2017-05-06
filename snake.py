@@ -79,5 +79,6 @@ class Snake(pygame.sprite.Sprite):
         self.gs.connection.update("%s %s" % (str(i), str(j)))
         
     def receive_location(self, loc):
-        print("~"+loc+"~")
+        spl = loc.split(" ")
         self.y = int(spl[1])
+        self.x = int(spl[0])
