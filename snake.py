@@ -13,7 +13,7 @@ class Snake(pygame.sprite.Sprite):
         self.score = 0
 
         self.delay = 0
-        self.pause = 2
+        self.pause = 3
 
         self.speed = 1
         self.x_modifier = self.speed

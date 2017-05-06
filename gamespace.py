@@ -38,8 +38,13 @@ class GameSpace:
         self.mono = pygame.font.SysFont("monospace", 15)     
 
         # part two
-        self.player = Snake(self, 0, 0, self.box_size)
-        self.opponent = Snake(self, 0, 0, self.box_size)
+        if (self.num):
+            self.player = Snake(self, 0, 0, self.box_size)
+            self.opponent = Snake(self, 10, 10, self.box_size)
+        else:
+            self.player = Snake(self, 10, 10, self.box_size)
+            self.opponent = Snake(self, 0, 0, self.box_size)
+
         self.grid = Grid(self, self.grid_size, self.grid_size)
         # self.connection = Connection(self.grid)
         self.clock = pygame.time.Clock()
@@ -66,8 +71,11 @@ class GameSpace:
                     sys.exit(1)
             return
 
-        self.grid.tick(self)#, self.player)
         self.player.tick(self)
+        self.opponent.tick(self)
+
+        self.grid.tick(self, self.player, Box.PATH, Box.MARKED, Box.ENEMY_PATH)
+        self.grid.tick(self, self.opponent, Box.ENEMY_PATH, Box.ENEMY_MARKED, Box.PATH)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -102,6 +110,8 @@ class GameSpace:
                     pygame.draw.rect(self.screen, ((255/2), 0, 0), self.boxes[i][j])
                 elif (self.grid.data[i_adj][j_adj] == Box.EMPTY):
                     pygame.draw.rect(self.screen, (0, 0, 255), self.boxes[i][j])
+                elif (self.grid.data[i_adj][j_adj] == Box.ENEMY):
+                    pygame.draw.rect(self.screen, (0, 0, 255/3), self.boxes[i][j])
 
             pygame.draw.rect(self.screen, (0, 255, 0),
                     self.boxes[self.player.x - self.x_offset][self.player.y - self.y_offset])
