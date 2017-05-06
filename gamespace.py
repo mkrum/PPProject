@@ -3,7 +3,6 @@ import sys
 from threading import Thread
 from snake import Snake
 from gamegrid import Grid, Box
-from connection import Connection
 from twisted.internet import reactor
 import time
 
@@ -36,12 +35,12 @@ class GameSpace:
                 self.boxes[i].append(pygame.Rect(x, y, self.box_size, self.box_size))
 
 
-
+        self.mono = pygame.font.SysFont("monospace", 15)     
 
         # part two
         self.player = Snake(self, 0, 0, self.box_size)
         self.grid = Grid(self, self.grid_size, self.grid_size)
-        self.connection = Connection(self.grid)
+        # self.connection = Connection(self.grid)
         self.clock = pygame.time.Clock()
 
         # draw initial screen
@@ -49,10 +48,11 @@ class GameSpace:
         # from the pygame Chimp example:
         if pygame.font:
             font = pygame.font.Font(None, 36)
-            text = font.render('Waiting for second player.', 1, (10, 10, 10))
-            textpos = text.get_rect(centerx=int(self.boxes_per_row/2),
-                    centery=int(self.boxes_per_row/2))
+            text = font.render('Waiting for second player.', 1, (255, 255, 255))
+            textpos = text.get_rect(centerx=int(self.width/2),
+                    centery=int(self.height/2))
             self.screen.blit(text, textpos)
+            pygame.display.flip()
 
 
     def game_space_tick(self):
@@ -102,12 +102,14 @@ class GameSpace:
                 elif (self.grid.data[i_adj][j_adj] == Box.EMPTY):
                     pygame.draw.rect(self.screen, (0, 0, 255), self.boxes[i][j])
 
-            pygame.draw.rect(self.screen, (0, 255, 0), self.boxes[self.player.x - self.x_offset][self.player.y - self.y_offset])
+            pygame.draw.rect(self.screen, (0, 255, 0),
+                    self.boxes[self.player.x - self.x_offset][self.player.y - self.y_offset])
 
-            myfont = pygame.font.SysFont("monospace", 15)
-            label = myfont.render("Score: %s" % (str(self.player.score)), 1, (255,255,0))
+            label = self.mono.render('Score: {}'
+                    .format((str(self.player.score))), 1, (255,255,0))
+
             self.screen.blit(label, (10, 10))
-            pygame.display.flip()
+        pygame.display.flip()
         
     def update_offset(self):
         x = self.player.x

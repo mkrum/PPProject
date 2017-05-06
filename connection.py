@@ -20,8 +20,6 @@ class Connection():
         if self.connection.ready:
             self.connection.transport.write("%s %s %s" % (str(i), str(j), str(value)))
 
-    def score
-
 #Client
 class ClientConnection(Protocol):
 

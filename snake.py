@@ -5,8 +5,9 @@ from math import sin, cos, radians
 class Snake(pygame.sprite.Sprite):
 
     def __init__(self, gs, x, y, size):
-        self.x = 0
-        self.y = 0
+        self.x = x
+        self.y = y
+
         self.score = 0
 
         self.delay = 0

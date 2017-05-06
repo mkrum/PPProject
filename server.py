@@ -38,7 +38,9 @@ class ClientConnection(Protocol):
         
         # both players are connected
         if len(self.conns) == 2:
+            print(self)
             for c in self.conns:
+                print(c)
                 c.transport.write('start the game')
 
     def connectionLost(self, reason):

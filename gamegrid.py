@@ -45,17 +45,18 @@ class Grid(pygame.sprite.Sprite):
             if (len(self.snake_path) > 1):
                 self.fill_path(gs)
             self.snake_path = []
+
         #check if you hit your own path
-        if (self.data[i][j] == Box.PATH):
+        elif (self.data[i][j] == Box.PATH):
             gs.game_over_screen()
-        if (self.data[i][j] == Box.ENEMY_PATH):
+        elif (self.data[i][j] == Box.ENEMY_PATH):
             gs.kill_other_snake()
         #check bounds
-        if (i < 0 or j < 0 or i > gs.grid_size or j > gs.grid_size):
+        elif (i < 0 or j < 0 or i > gs.grid_size or j > gs.grid_size):
             gs.game_over_screen()
         else:
             self.data[i][j] = Box.PATH
-            gs.connection.update(i, j, Box.PATH)
+            # gs.connection.update(i, j, Box.PATH)
             self.snake_path.append([i, j])
 
         self.old_i = i
@@ -98,7 +99,7 @@ class Grid(pygame.sprite.Sprite):
                 gs.player.score += 1
 
             self.data[i][j] = Box.MARKED
-            gs.connection.update(i, j, Box.MARKED)
+            # gs.connection.update(i, j, Box.MARKED)
 
             try:
                 self.i_ranges[i].append(j)
@@ -230,7 +231,7 @@ class Grid(pygame.sprite.Sprite):
                 gs.player.score += 1
 
             self.data[current[0]][current[1]] = Box.MARKED
-            gs.connection.update(current[0], current[1], Box.MARKED)
+            # gs.connection.update(current[0], current[1], Box.MARKED)
             
             for adj in self.get_valid_edges(current, visited, Box.EMPTY):
                 q.put(adj)
