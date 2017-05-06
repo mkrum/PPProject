@@ -62,6 +62,7 @@ class GameSpace:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     sys.exit(1)
+            return
 
         self.grid.tick(self)#, self.player)
         self.player.tick(self)
