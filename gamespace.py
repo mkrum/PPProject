@@ -38,12 +38,6 @@ class GameSpace:
         self.mono = pygame.font.SysFont("monospace", 15)     
 
         # part two
-        if (self.num):
-            self.player = Snake(self, 0, 0, self.box_size)
-            self.opponent = Snake(self, 10, 10, self.box_size)
-        else:
-            self.player = Snake(self, 10, 10, self.box_size)
-            self.opponent = Snake(self, 0, 0, self.box_size)
 
         self.grid = Grid(self, self.grid_size, self.grid_size)
         # self.connection = Connection(self.grid)
@@ -60,6 +54,13 @@ class GameSpace:
             self.screen.blit(text, textpos)
             pygame.display.flip()
 
+    def set_players(self, num):
+        if (num):
+            self.player = Snake(self, 0, 0, self.box_size)
+            self.opponent = Snake(self, 10, 10, self.box_size)
+        else:
+            self.player = Snake(self, 10, 10, self.box_size)
+            self.opponent = Snake(self, 0, 0, self.box_size)
 
     def game_space_tick(self):
         # part three

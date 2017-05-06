@@ -30,8 +30,8 @@ class ClientConnection(Protocol):
     def forwardData(self, data):
         if 'start the game' in data:
             _, num = data.split(',', 1)
+            self.gs.set_player(num)
             self.gs.started = True
-            self.gs.num = num
         elif self.gs.started:
             print('data: {}'.format(data))
             self.gs.opponent.receive_move(data)
@@ -60,7 +60,7 @@ def errorHandler(reason):
 if __name__ == '__main__':
     gs = GameSpace()
     gs.main()
-
+        
     gs_tick = LoopingCall(gs.game_space_tick)
     gs_tick.start((1.0/60.0)).addErrback(errorHandler)
 
