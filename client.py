@@ -28,8 +28,10 @@ class ClientConnection(Protocol):
         self.queue.put(data)
 
     def forwardData(self, data):
-        if data == 'start the game':
+        if 'start the game' in data:
+            _, num = data.split(',', 1)
             self.gs.started = True
+            self.gs.num = num
         elif self.gs.started:
             print('data: {}'.format(data))
             self.gs.opponent.receive_move(data)
