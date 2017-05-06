@@ -2,12 +2,14 @@ import pygame
 import sys
 from snake import Snake
 from gamegrid import Grid, Box
-from connection import Connection
+#from connection import Connection
 
 class GameSpace:
 
     def main(self):
         # part one
+        self.started = False
+        
         pygame.init()
         self.size = self.width, self.height = 600, 600 
 
@@ -18,7 +20,7 @@ class GameSpace:
 
         self.screen_width = 60
 
-        self.boxes = [ [] for _ in xrange(self.screen_width) ]
+        self.boxes = [ [] for _ in range(self.screen_width) ]
 
         self.box_size = 10
         self.x_offset = 0
@@ -33,54 +35,69 @@ class GameSpace:
         # part two
         self.player = Snake(self, 0, 0, self.box_size)
         self.grid = Grid(self, self.grid_size, self.grid_size)
-        self.connection = Connection(self.grid)
         self.clock = pygame.time.Clock()
 
+        # draw initial screen
+        self.screen.fill(self.black)
+        # from the pygame Chimp example:
+        if pygame.font:
+            font = pygame.font.Font(None, 36)
+            text = font.render('Waiting for second player.', 1, (10, 10, 10))
+            textpos = text.get_rect(centerx=int(self.screen_width/2),
+                    centery=int(self.screen_width/2))
+            self.screen.blit(text, textpos)
+
+
+    def game_space_tick(self):
         # part three
-        while 1:
+        # self.clock.tick(60)
 
-            self.clock.tick(60)
-
-            self.grid.tick(self)#, self.player)
-            self.player.tick(self)
-
+        if not self.started:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     sys.exit(1)
 
-                if event.type == pygame.KEYDOWN: 
-                    if event.key == ord("s"):
-                        self.player.move_down()
+        self.grid.tick(self)#, self.player)
+        self.player.tick(self)
 
-                    if event.key == ord("w"):
-                        self.player.move_up()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit(1)
 
-                    if event.key == ord("d"):
-                        self.player.move_right()
+            if event.type == pygame.KEYDOWN: 
+                if event.key == ord("s"):
+                    self.player.move_down()
 
-                    if event.key == ord("a"):
-                        self.player.move_left()
+                if event.key == ord("w"):
+                    self.player.move_up()
 
+                if event.key == ord("d"):
+                    self.player.move_right()
 
-            self.screen.fill(self.black)
-
-            self.update_offset()
-            for i in range(self.screen_width):
-                for j in range(self.screen_width):
-                    
-                    i_adj = i + self.x_offset
-                    j_adj = j + self.y_offset
-
-                    if (self.grid.data[i_adj][j_adj] == Box.MARKED):
-                        pygame.draw.rect(self.screen, (255, 0, 0), self.boxes[i][j])
-                    elif (self.grid.data[i_adj][j_adj] == Box.PATH):
-                        pygame.draw.rect(self.screen, ((255/2), 0, 0), self.boxes[i][j])
-                    elif (self.grid.data[i_adj][j_adj] == Box.EMPTY):
-                        pygame.draw.rect(self.screen, (0, 0, 255), self.boxes[i][j])
+                if event.key == ord("a"):
+                    self.player.move_left()
 
 
-            pygame.draw.rect(self.screen, (0, 255, 0), self.boxes[self.player.x - self.x_offset][self.player.y - self.y_offset])
-            pygame.display.flip()
+        self.screen.fill(self.black)
+
+        self.update_offset()
+        for i in range(self.screen_width):
+            for j in range(self.screen_width):
+                
+                i_adj = i + self.x_offset
+                j_adj = j + self.y_offset
+
+                if (self.grid.data[i_adj][j_adj] == Box.MARKED):
+                    pygame.draw.rect(self.screen, (255, 0, 0), self.boxes[i][j])
+                elif (self.grid.data[i_adj][j_adj] == Box.PATH):
+                    pygame.draw.rect(self.screen, ((255/2), 0, 0), self.boxes[i][j])
+                elif (self.grid.data[i_adj][j_adj] == Box.EMPTY):
+                    pygame.draw.rect(self.screen, (0, 0, 255), self.boxes[i][j])
+
+
+        pygame.draw.rect(self.screen, (0, 255, 0),
+                self.boxes[self.player.x - self.x_offset][self.player.y - self.y_offset])
+        pygame.display.flip()
 
         
     def update_offset(self):
@@ -101,8 +118,6 @@ class GameSpace:
         else:
             self.y_offset = y - self.screen_width/2
         
-if __name__ == '__main__':
-    gs = GameSpace()
-    gs.main()
-
-    
+#if __name__ == '__main__':
+#    gs = GameSpace()
+#    gs.main()   
