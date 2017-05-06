@@ -20,22 +20,21 @@ class GameSpace:
         self.black = 0, 0, 0 #RGB
         self.screen = pygame.display.set_mode(self.size)
 
-        self.screen_width = 60
+        self.boxes_per_row = 60
 
-        self.boxes = [ [] for _ in range(self.screen_width) ]
+        self.boxes = [ [] for _ in range(self.boxes_per_row) ]
 
         self.box_size = 10
         self.x_offset = 0
         self.y_offset = 0
         
-        for i in range(self.screen_width):
+        for i in range(self.boxes_per_row):
             y = i * self.box_size
-            for j in range(self.screen_width):
+            for j in range(self.boxes_per_row):
                 x = j * self.box_size
                 self.boxes[i].append(pygame.Rect(x, y, self.box_size, self.box_size))
 
-        #tracks score
-        myfont = pygame.font.SysFont("monospace", 15)
+
 
 
         # part two
@@ -50,8 +49,8 @@ class GameSpace:
         if pygame.font:
             font = pygame.font.Font(None, 36)
             text = font.render('Waiting for second player.', 1, (10, 10, 10))
-            textpos = text.get_rect(centerx=int(self.screen_width/2),
-                    centery=int(self.screen_width/2))
+            textpos = text.get_rect(centerx=int(self.boxes_per_row/2),
+                    centery=int(self.boxes_per_row/2))
             self.screen.blit(text, textpos)
 
 
@@ -88,8 +87,8 @@ class GameSpace:
         self.screen.fill(self.black)
 
         self.update_offset()
-        for i in range(self.screen_width):
-            for j in range(self.screen_width):
+        for i in range(self.boxes_per_row):
+            for j in range(self.boxes_per_row):
                 
                 i_adj = i + self.x_offset
                 j_adj = j + self.y_offset
@@ -103,7 +102,8 @@ class GameSpace:
 
             pygame.draw.rect(self.screen, (0, 255, 0), self.boxes[self.player.x - self.x_offset][self.player.y - self.y_offset])
 
-            label = myfont.render("Score: %s" % (str(gs.player.score)), 1, (255,255,0))
+            myfont = pygame.font.SysFont("monospace", 15)
+            label = myfont.render("Score: %s" % (str(self.player.score)), 1, (255,255,0))
             self.screen.blit(label, (10, 10))
             pygame.display.flip()
         
@@ -111,19 +111,19 @@ class GameSpace:
         x = self.player.x
         y = self.player.y
 
-        if (x < self.screen_width/2):
+        if (x < self.boxes_per_row/2):
             self.x_offset = 0
-        elif (x > self.grid_size - self.screen_width):
-            self.x_offset = self.grid_size - self.screen_width
+        elif (x > self.grid_size - self.boxes_per_row):
+            self.x_offset = self.grid_size - self.boxes_per_row
         else:
-            self.x_offset = x - self.screen_width/2
+            self.x_offset = x - self.boxes_per_row/2
 
-        if (y < self.screen_width/2):
+        if (y < self.boxes_per_row/2):
             self.y_offset = 0
-        elif (y > self.grid_size - self.screen_width):
-            self.y_offset = self.grid_size - self.screen_width
+        elif (y > self.grid_size - self.boxes_per_row):
+            self.y_offset = self.grid_size - self.boxes_per_row
         else:
-            self.y_offset = y - self.screen_width/2
+            self.y_offset = y - self.boxes_per_row/2
         
 #if __name__ == '__main__':
 #    gs = GameSpace()
