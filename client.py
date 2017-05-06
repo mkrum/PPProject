@@ -21,29 +21,20 @@ class ClientConnection(Protocol):
     def connectionMade(self):
         print('client connection made')
     
-    def update(self, i, j, value):
-        self.transport.write('{} {} {}'.format(i, j, value))
+    def update(self, move):
+        self.transport.write('{}'.format(move))
 
     def dataReceived(self, data):
-        # print('home client connection got data: {}'.format(data))
         self.queue.put(data)
 
     def forwardData(self, data):
         if data == 'start the game':
-            print('starting game')
             self.gs.started = True
         elif self.gs.started:
             print('data: {}'.format(data))
-        else:
-            print('data: {}'.format(data))
+            self.gs.opponent.receive_move(data)
         self.queue.get().addCallback(self.forwardData)
 
-    #def dataReceived(self, data):
-    #    # print('home client connection got data: {}'.format(data))
-    #    self.queue.put(data)
-
-    #def forwardData(self, data):
-    #    self.queue.get().addCallback(self.forwardData)
     def startForwarding(self):
         self.queue.get().addCallback(self.forwardData)
 
@@ -60,6 +51,7 @@ class ClientConnectionFactory(ClientFactory):
         return self.conn
 
 def errorHandler(reason):
+    print(reason)
     if reactor.running:
         reactor.stop()
 

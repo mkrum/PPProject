@@ -8,6 +8,8 @@ class Snake(pygame.sprite.Sprite):
         self.x = x
         self.y = y
 
+        self.gs = gs
+
         self.score = 0
 
         self.delay = 0
@@ -26,18 +28,47 @@ class Snake(pygame.sprite.Sprite):
         self.delay = (self.delay + 1) % self.pause
 
     def move_up(self):
+        self.send_move('up')
+        self.up()
+
+    def up(self):
         self.y_modifier = -1 * self.speed
         self.x_modifier = 0
 
     def move_down(self):
+        self.send_move('down')
+        self.down()
+
+    def down(self):
         self.y_modifier = self.speed
         self.x_modifier = 0
 
     def move_right(self):
+        self.send_move('right')
+        self.right()
+
+    def right(self):
         self.x_modifier = self.speed
         self.y_modifier = 0
 
     def move_left(self):
+        self.send_move('left')
+        self.left()
+
+    def left(self):
         self.x_modifier = -1 * self.speed
         self.y_modifier = 0
+
+    def send_move(self, move):
+        self.gs.connection.update(move)
+
+    def receive_move(self, move):
+        if move == 'up':
+            self.up()
+        elif move == 'down':
+            self.down()
+        elif move == 'left':
+            self.left()
+        elif move == 'right':
+            self.right()
 
