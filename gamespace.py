@@ -1,8 +1,10 @@
 import pygame
 import sys
+from threading import Thread
 from snake import Snake
 from gamegrid import Grid, Box
 from connection import Connection
+from twisted.internet import reactor
 
 class GameSpace:
 
@@ -30,10 +32,15 @@ class GameSpace:
                 x = j * self.box_size
                 self.boxes[i].append(pygame.Rect(x, y, self.box_size, self.box_size))
 
+        #tracks score
+        myfont = pygame.font.SysFont("monospace", 15)
+
+
         # part two
         self.player = Snake(self, 0, 0, self.box_size)
         self.grid = Grid(self, self.grid_size, self.grid_size)
         self.connection = Connection(self.grid)
+        Thread(target=reactor.run, args=(False, )).start()
         self.clock = pygame.time.Clock()
 
         # part three
@@ -80,6 +87,9 @@ class GameSpace:
 
 
             pygame.draw.rect(self.screen, (0, 255, 0), self.boxes[self.player.x - self.x_offset][self.player.y - self.y_offset])
+
+            label = myfont.render("Score: %s" % (str(gs.player.score)), 1, (255,255,0))
+            self.screen.blit(label, (10, 10))
             pygame.display.flip()
 
         

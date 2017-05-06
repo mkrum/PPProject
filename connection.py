@@ -9,8 +9,6 @@ class Connection():
     def __init__(self, grid):
         self.grid = grid
         reactor.connectTCP("ash.campus.nd.edu", 40067, self.createClientCon())
-        reactor.run()
-        print("connect")
 
     def createClientCon(self):
         cf = clientFactory()
@@ -22,11 +20,13 @@ class Connection():
         if self.connection.ready:
             self.connection.transport.write("%s %s %s" % (str(i), str(j), str(value)))
 
+    def score
 
 #Client
 class ClientConnection(Protocol):
 
     def connectionMade(self):
+        print("connect")
         self.ready = True
 
     def createDataCon(self):
@@ -34,7 +34,6 @@ class ClientConnection(Protocol):
         self.data_connection = data_factory.myconn
         self.data_connection.service_connection = self
         return data_factory
-
 
 
 
