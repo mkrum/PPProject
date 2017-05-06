@@ -10,7 +10,7 @@ class GameSpace:
 
     def main(self):
         # part one
-        self.started = True
+        self.started = False
         
         pygame.init()
         self.size = self.width, self.height = 600, 600 
@@ -38,8 +38,12 @@ class GameSpace:
         self.mono = pygame.font.SysFont("monospace", 15)     
 
         # part two
-        self.player = Snake(self, 0, 0, self.box_size)
-        self.opponent = Snake(self, 10, 10, self.box_size)
+        if (self.num):
+            self.player = Snake(self, 0, 0, self.box_size)
+            self.opponent = Snake(self, 10, 10, self.box_size)
+        else:
+            self.player = Snake(self, 10, 10, self.box_size)
+            self.opponent = Snake(self, 0, 0, self.box_size)
 
         self.grid = Grid(self, self.grid_size, self.grid_size)
         # self.connection = Connection(self.grid)
