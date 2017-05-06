@@ -30,7 +30,7 @@ class ClientConnection(Protocol):
     def forwardData(self, data):
         if 'start the game' in data:
             _, num = data.split(',', 1)
-            self.gs.set_player(num)
+            self.gs.set_players(num)
             self.gs.started = True
         elif self.gs.started:
             print('data: {}'.format(data))
