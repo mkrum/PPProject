@@ -5,23 +5,24 @@ from math import sin, cos, radians
 class Snake(pygame.sprite.Sprite):
 
     def __init__(self, gs, x, y, size):
-        self.x = x
-        self.y = y
-        self.size = size
+        self.x = 0
+        self.y = 0
+        self.score = 0
 
-        self.speed = size
+        self.delay = 0
+        self.pause = 2
+
+        self.speed = 1
         self.x_modifier = self.speed
         self.y_modifier = 0
-
-        self.rect = pygame.Rect(self.x, self.y, self.size, self.size)
    
-
     def tick(self, gs):
         #update position
-        self.x += self.x_modifier 
-        self.y += self.y_modifier
-        
-        self.rect = pygame.Rect(self.x, self.y, self.size, self.size)
+        if (self.delay == 0):
+            self.x += self.y_modifier 
+            self.y += self.x_modifier
+
+        self.delay = (self.delay + 1) % self.pause
 
     def move_up(self):
         self.y_modifier = -1 * self.speed

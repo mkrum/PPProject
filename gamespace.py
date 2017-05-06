@@ -5,12 +5,13 @@ from snake import Snake
 from gamegrid import Grid, Box
 from connection import Connection
 from twisted.internet import reactor
+import time
 
 class GameSpace:
 
     def main(self):
         # part one
-        self.started = False
+        self.started = True
         
         pygame.init()
         self.size = self.width, self.height = 600, 600 
@@ -125,7 +126,29 @@ class GameSpace:
             self.y_offset = self.grid_size - self.boxes_per_row
         else:
             self.y_offset = y - self.boxes_per_row/2
-        
-#if __name__ == '__main__':
-#    gs = GameSpace()
-#    gs.main()   
+
+    def game_over_screen(self):
+        #self.connection.hey_I_died()
+
+        font = pygame.font.Font(None, 36)
+        text = font.render('Game Over', 1, (255, 10, 10))
+        textpos = text.get_rect(centerx=int(self.width/2),
+                                centery=int(self.height/2))
+        self.screen.blit(text, textpos)
+        pygame.display.flip()
+        time.sleep(3)
+        reactor.stop()
+
+    def win_screen(self):
+        font = pygame.font.Font(None, 36)
+        text = font.render('You Win!', 1, (255, 10, 10))
+        textpos = text.get_rect(centerx=int(self.width/2),
+                                centery=int(self.height/2))
+        self.screen.blit(text, textpos)
+        pygame.display.flip()
+        time.sleep(3)
+        reactor.stop()
+
+    def kill_other_snake(self):
+        self.win_screen()
+        #self.connection.kill() or something

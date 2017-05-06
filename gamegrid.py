@@ -6,6 +6,8 @@ class Box():
     EMPTY = 0
     MARKED = 1
     PATH = 2
+    ENEMY_PATH = 3
+    ENEMY = 4
 
 class Grid(pygame.sprite.Sprite):
 
@@ -25,31 +27,48 @@ class Grid(pygame.sprite.Sprite):
                 self.data[i].append(Box.EMPTY)
                 if(i + j < 3):
                     self.data[i][j] = Box.MARKED
-
+        self.old_i = 0
+        self.old_j = 0
    
 
     def tick(self, gs):
         #mark the spot of the current snake
+
         i = gs.player.x
         j = gs.player.y
+
+        if i == self.old_i and j == self.old_j:
+            return
 
         if(self.data[i][j] == Box.MARKED):
             self.snake_path.append([i, j])
             if (len(self.snake_path) > 1):
-                self.fill_path()
+                self.fill_path(gs)
             self.snake_path = []
+        #check if you hit your own path
+        if (self.data[i][j] == Box.PATH):
+            gs.game_over_screen()
+        if (self.data[i][j] == Box.ENEMY_PATH):
+            gs.kill_other_snake()
+        #check bounds
+        if (i < 0 or j < 0 or i > gs.grid_size or j > gs.grid_size):
+            gs.game_over_screen()
         else:
             self.data[i][j] = Box.PATH
             gs.connection.update(i, j, Box.PATH)
             self.snake_path.append([i, j])
 
-
+        self.old_i = i
+        self.old_j = j
+        
 
     #there must be a better way to do this
-    def fill_path(self):
+    def fill_path(self, gs):
         
         if (len(self.snake_path) < 2):
             return 
+
+        #track total change in score so its only a single message
 
         #complete right angle
         end = list(self.snake_path[-1])
@@ -73,6 +92,11 @@ class Grid(pygame.sprite.Sprite):
         self.j_ranges = {}
 
         for (i, j) in self.snake_path:
+
+            #check if its a new block, if so, increment score
+            if (self.data[i][j] != Box.MARKED):
+                gs.player.score += 1
+
             self.data[i][j] = Box.MARKED
             gs.connection.update(i, j, Box.MARKED)
 
@@ -120,7 +144,7 @@ class Grid(pygame.sprite.Sprite):
                 for k in range(len(self.i_ranges[i]) - 1):
                     if (j > self.i_ranges[i][k] and j < self.i_ranges[i][ k + 1 ]):
                         if (self.data[i][j] == Box.EMPTY):
-                            self.fill_shape((i, j), self.snake_path) 
+                            self.fill_shape((i, j), self.snake_path, gs) 
                             return
 
                 for k in range(len(self.j_ranges[j]) - 1):
@@ -194,15 +218,24 @@ class Grid(pygame.sprite.Sprite):
 
         return points
 
-    def fill_shape(self, point, path):
+    def fill_shape(self, point, path, gs):
         q = Queue()
         visited = set()
         q.put(point)
         
         while not q.empty():
             current = q.get()
+
+            if (self.data[current[0]][current[1]] != Box.MARKED):
+                gs.player.score += 1
+
             self.data[current[0]][current[1]] = Box.MARKED
             gs.connection.update(current[0], current[1], Box.MARKED)
             
             for adj in self.get_valid_edges(current, visited, Box.EMPTY):
                 q.put(adj)
+
+    def update(self, i, j, value):
+        self.data[i][j] = value
+
+
