@@ -75,8 +75,6 @@ class Grid(pygame.sprite.Sprite):
         if (len(snake_path) < 2):
             return 
 
-        #track total change in score so its only a single message
-
         #complete right angle
         end = list(snake_path[-1])
 
@@ -97,7 +95,6 @@ class Grid(pygame.sprite.Sprite):
 
         for p in add_points:
             snake_path.append(p)
-
         i_ranges = {}
         j_ranges = {}
 
@@ -116,8 +113,6 @@ class Grid(pygame.sprite.Sprite):
             except:
                 i_ranges[i] = [j]
                 j_ranges[j] = [i]
-
-
 
         for k in i_ranges.keys():
             l = sorted(i_ranges[k])
@@ -163,7 +158,7 @@ class Grid(pygame.sprite.Sprite):
                             self.fill_shape((i, j), snake_path, gs, marked_value) 
                             return
 
-    def get_valid_edges(self, p1, visited, box_type):
+    def get_valid_edges(self, p1, visited, not_box_types):
         edges = []
         for i in range(-1, 2):
             for j in range(-1, 2):
@@ -172,7 +167,7 @@ class Grid(pygame.sprite.Sprite):
                     p[0] += i
                     p[1] += j
                     try:
-                        if (self.data[p[0]][p[1]] == box_type):
+                        if (self.data[p[0]][p[1]] not in not_box_types):
                             if ((p[0], p[1]) not in visited):
                                 edges.append(p)
                                 visited.add((p[0], p[1]))
@@ -205,7 +200,7 @@ class Grid(pygame.sprite.Sprite):
             if current[0] == end[0] and current[1] == end[1]:
                 return self.build_path(previous, end)
 
-            for edge in self.get_valid_edges(current, visited, marked_value):
+            for edge in self.get_valid_edges(current, visited, [Box.EMPTY, Box.PATH, Box.ENEMY_PATH]):
                 newDist = dist[(current[0], current[1])] + 1
 
                 try:
@@ -242,7 +237,7 @@ class Grid(pygame.sprite.Sprite):
 
             self.data[current[0]][current[1]] = marked_value 
             
-            for adj in self.get_valid_edges(current, visited, Box.EMPTY):
+            for adj in self.get_valid_edges(current, visited, [Box.MARKED]):
                 q.put(adj)
 
     def update(self, i, j, value):
