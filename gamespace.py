@@ -4,7 +4,6 @@ from threading import Thread
 from snake import Snake
 from gamegrid import Grid, Box
 from twisted.internet import reactor
-import time
 
 class GameSpace:
 
@@ -41,7 +40,6 @@ class GameSpace:
         # part two
 
         self.grid = Grid(self, self.grid_size, self.grid_size)
-        # self.connection = Connection(self.grid)
         self.clock = pygame.time.Clock()
 
         # draw initial screen
@@ -72,7 +70,10 @@ class GameSpace:
         if not self.started or self.finished:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    sys.exit(1)
+                    reactor.stop()
+                
+                if event.type == pygame.MOUSEBUTTONDOWN and self.finished:
+                    reactor.stop()
             return
 
         self.player.tick(self)
@@ -97,11 +98,9 @@ class GameSpace:
 
                 if event.key == ord("a"):
                     self.player.move_left()
-
-            if event.type == pygame.MOUSEBUTTONDOWN and self.finished:
-                reactor.stop()
-
-
+        
+        if self.finished:
+            return
 
         self.screen.fill(self.black)
 
@@ -148,20 +147,21 @@ class GameSpace:
         else:
             self.y_offset = y - self.boxes_per_row/2
 
-    def game_over_screen(self):
-        #self.connection.hey_I_died()
+    def game_over_screen(self, result):
+        self.connection.update(result)
         self.finished = True
         font = pygame.font.Font(None, 36)
-        text = font.render('Game Over', 1, (255, 10, 10))
+        text = font.render('Game Over - You {}!'.format(result), 1, (255, 10, 10))
         textpos = text.get_rect(centerx=int(self.width/2),
                                 centery=int(self.height/2))
         self.screen.blit(text, textpos)
         pygame.display.flip()
 
     def win_screen(self):
+        self.connection.update('lose')
         self.finished = True
         font = pygame.font.Font(None, 36)
-        text = font.render('You Win!', 1, (255, 10, 10))
+        text = font.render('Game Over - You Win!', 1, (255, 10, 10))
         textpos = text.get_rect(centerx=int(self.width/2),
                                 centery=int(self.height/2))
         self.screen.blit(text, textpos)
@@ -169,4 +169,3 @@ class GameSpace:
 
     def kill_other_snake(self):
         self.win_screen()
-        #self.connection.kill() or something

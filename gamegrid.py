@@ -53,12 +53,12 @@ class Grid(pygame.sprite.Sprite):
 
         #check if you hit your own path
         elif (self.data[i][j] == path_value):
-            gs.game_over_screen()
+            gs.game_over_screen('lose')
         elif (self.data[i][j] == enemy_path_value):
-            gs.kill_other_snake()
+            gs.game_over_screen('win')
         #check bounds
         elif (i < 0 or j < 0 or i > gs.grid_size or j > gs.grid_size):
-            gs.game_over_screen()
+            gs.game_over_screen('lose')
         else:
             self.data[i][j] = path_value
             # gs.connection.update(i, j, Box.PATH)

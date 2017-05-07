@@ -34,7 +34,10 @@ class ClientConnection(Protocol):
             self.gs.started = True
         elif self.gs.started:
             print('data: {}'.format(data))
-            self.gs.opponent.receive_move_location(data)
+            if 'win' in data or 'lose' in data:
+                self.gs.game_over_screen(data)
+            else:
+                self.gs.opponent.receive_move(data)
         self.queue.get().addCallback(self.forwardData)
 
     def startForwarding(self):
