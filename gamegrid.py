@@ -91,7 +91,10 @@ class Grid(pygame.sprite.Sprite):
         new_point = list(move)
         snake_path.append(new_point)
         add_points = self.find_path(new_point, end, marked_value)
-        
+
+        if len(add_points) == 0:
+            return
+
         for p in add_points:
             snake_path.append(p)
 
