@@ -34,7 +34,7 @@ class ClientConnection(Protocol):
             self.gs.started = True
         elif self.gs.started:
             print('data: {}'.format(data))
-            self.gs.opponent.receive_location(data)
+            self.gs.opponent.receive_move_location(data)
         self.queue.get().addCallback(self.forwardData)
 
     def startForwarding(self):
@@ -65,5 +65,5 @@ if __name__ == '__main__':
     gs_tick.start((1.0/60.0)).addErrback(errorHandler)
 
     clientConnFactory = ClientConnectionFactory(gs)
-    reactor.connectTCP("newt.campus.nd.edu", 40067, clientConnFactory)
+    reactor.connectTCP("newt.campus.nd.edu", 40071, clientConnFactory)
     reactor.run()

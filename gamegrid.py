@@ -20,7 +20,6 @@ class Grid(pygame.sprite.Sprite):
         
         self.data = [ [] for _ in xrange(N_height) ]
 
-        self.snake_path = {}
         
         for i in range(self.height):
             for j in range(self.width):
@@ -28,6 +27,7 @@ class Grid(pygame.sprite.Sprite):
                 self.data[i].append(Box.EMPTY)
                 if(i + j < 3):
                     self.data[i][j] = Box.MARKED
+
         self.old_i = {}
         self.old_j = {}
    
@@ -44,14 +44,12 @@ class Grid(pygame.sprite.Sprite):
         except:
             self.old_i[snake] = i
             self.old_j[snake] = j
-            self.snake_path[snake] = []
-            self.snake_path[snake] = []
 
         if(self.data[i][j] == marked_value):
-            self.snake_path[snake].append([i, j])
-            if (len(self.snake_path[snake]) > 1):
-                self.fill_path(gs, self.snake_path[snake], marked_value)
-            self.snake_path[snake] = []
+            snake.path.append([i, j])
+            if (len(snake.path) > 1):
+                self.fill_path(gs, snake.path, marked_value)
+            snake.path = []
 
         #check if you hit your own path
         elif (self.data[i][j] == path_value):
@@ -64,7 +62,7 @@ class Grid(pygame.sprite.Sprite):
         else:
             self.data[i][j] = path_value
             # gs.connection.update(i, j, Box.PATH)
-            self.snake_path[snake].append([i, j])
+            snake.path.append([i, j])
 
         self.old_i[snake] = i
         self.old_j[snake] = j
