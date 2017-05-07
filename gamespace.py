@@ -149,19 +149,13 @@ class GameSpace:
 
     def game_over_screen(self, me, opp):
         self.connection.update(opp)
-        self.finished = True
-        font = pygame.font.Font(None, 36)
-        text = font.render('Game Over - You {}!'.format(me), 1, (255, 10, 10))
-        textpos = text.get_rect(centerx=int(self.width/2),
-                                centery=int(self.height/2))
-        self.screen.blit(text, textpos)
-        pygame.display.flip()
+        self.text_screen('Game Over - You {}! Click to quit.'.format(me))
 
-    def win_screen(self):
-        self.connection.update('lose')
+    def text_screen(self, text):
         self.finished = True
+        self.screen.fill(self.black)
         font = pygame.font.Font(None, 36)
-        text = font.render('Game Over - You Win!', 1, (255, 10, 10))
+        text = font.render(text, 1, (255, 10, 10))
         textpos = text.get_rect(centerx=int(self.width/2),
                                 centery=int(self.height/2))
         self.screen.blit(text, textpos)

@@ -35,7 +35,9 @@ class ClientConnection(Protocol):
         elif self.gs.started:
             print('data: {}'.format(data))
             if 'win' in data or 'lose' in data:
-                self.gs.game_over_screen(data)
+                self.gs.text_screen('Game Over - You {}! Click to quit.'.format(data))
+            elif 'connection lost' in data:
+                self.gs.text_screen('Other player has left. Click to quit.')
             else:
                 self.gs.opponent.receive_move_location(data, gs.grid.data)
         self.queue.get().addCallback(self.forwardData)
@@ -68,5 +70,5 @@ if __name__ == '__main__':
     gs_tick.start((1.0/60.0)).addErrback(errorHandler)
 
     clientConnFactory = ClientConnectionFactory(gs)
-    reactor.connectTCP("newt.campus.nd.edu", 40071, clientConnFactory)
+    reactor.connectTCP("newt.campus.nd.edu", 40067, clientConnFactory)
     reactor.run()
