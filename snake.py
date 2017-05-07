@@ -1,6 +1,6 @@
 import pygame
 from math import sin, cos, radians
-
+from gamegrid import Box
 
 class Snake(pygame.sprite.Sprite):
 
@@ -20,14 +20,19 @@ class Snake(pygame.sprite.Sprite):
         self.x_modifier = self.speed
         self.y_modifier = 0
         self.sync = False
+        self.message = ''
    
     def tick(self, gs):
         #update position
-        if (self.delay == 0):
-            self.x += self.y_modifier 
-            self.y += self.x_modifier
+        if (self.message != ''):
+            self.parse_message(self.message) 
+            self.message = ''
+        else:
+            if (self.delay == 0):
+                self.x += self.y_modifier 
+                self.y += self.x_modifier
 
-        self.delay = (self.delay + 1) % self.pause
+            self.delay = (self.delay + 1) % self.pause
 
     def move_up(self):
         self.send_move_location('up', self.x, self.y)
@@ -86,8 +91,36 @@ class Snake(pygame.sprite.Sprite):
     def send_move_location(self, move, i, j):
         self.gs.connection.update(move + " %s %s" % (str(i), str(j)))
 
-    def receive_move_location(self, message):
+    def receive_move_location(self, message, data):
+        self.message = message
+        self.data = data
+
+    def parse_message(self, message):
         spl = message.split(" ")
+
+        turn_point = (int(spl[1]), int(spl[2]))
+        adjust = 0
+        for i in self.path[::-1]:
+            if i[0] != turn_point[0] and i[1] != turn_point[1]:
+                self.path.remove(i)
+                adjust += 1
+                self.data[i[0]][i[1]] = Box.EMPTY
+            else:
+                break
+        self.x = turn_point[0]
+        self.y = turn_point[1]
+                
+        for _ in range(adjust):
+            if move == 'up':
+                self.y -= 1
+            elif move == 'down':
+                self.y += 1
+            elif move == 'left':
+                self.x += 1
+            elif move == 'right':
+                self.x -= 1
+    
+            self.data[self.x][self.y] = Box.ENEMY_PATH
 
         move = spl[0]
         if move == 'up':
@@ -99,26 +132,3 @@ class Snake(pygame.sprite.Sprite):
         elif move == 'right':
             self.right()
         
-        turn_point = (int(spl[1]), int(spl[2]))
-        adjust = 0
-
-        for i in self.path[::-1]:
-            if i[0] != turn_point[0] and i[1] != turn_point[1]:
-                self.path.remove(i)
-                adjust += 1
-                #somehow reset the data to empty
-            else:
-                break
-        
-        self.x = turn_point[0]
-        self.y = turn_point[1]
-
-        if move == 'up':
-            self.y -= adjust
-        elif move == 'down':
-            self.y += adjust
-        elif move == 'left':
-            self.x += adjust
-        elif move == 'right':
-            self.x -= adjust
-
