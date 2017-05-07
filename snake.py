@@ -89,17 +89,19 @@ class Snake(pygame.sprite.Sprite):
         self.x = int(spl[0])
 
     def send_move_location(self, move, i, j):
-        self.gs.connection.update(move + " %s %s" % (str(i), str(j)))
+        self.gs.connection.update(move + " %s %s," % (str(i), str(j)))
 
     def receive_move_location(self, message, data):
         self.message = message
         self.data = data
 
     def parse_message(self, message):
+        message = message.split(',')[-1]
         spl = message.split(" ")
 
         turn_point = (int(spl[1]), int(spl[2]))
         adjust = 0
+                
         for i in self.path[::-1]:
             if i[0] != turn_point[0] and i[1] != turn_point[1]:
                 self.path.remove(i)
@@ -110,6 +112,7 @@ class Snake(pygame.sprite.Sprite):
         self.x = turn_point[0]
         self.y = turn_point[1]
                 
+        move = spl[0]
         for _ in range(adjust):
             if move == 'up':
                 self.y -= 1
@@ -122,7 +125,6 @@ class Snake(pygame.sprite.Sprite):
     
             self.data[self.x][self.y] = Box.ENEMY_PATH
 
-        move = spl[0]
         if move == 'up':
             self.up()
         elif move == 'down':
