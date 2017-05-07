@@ -2,6 +2,9 @@ from twisted.internet.protocol import ClientFactory
 from twisted.internet.protocol import Protocol
 from twisted.internet import reactor
 from twisted.internet.defer import DeferredQueue
+from twisted.python import log
+import sys
+log.startLogging(sys.stdout)
 
 '''
     Useful resource:
@@ -47,9 +50,8 @@ class ClientConnection(Protocol):
             print('number of connections: {}'.format(len(self.conns)))
 
             # remove the other connection if there is one
-            if self.conns:
-                self.conns[0].transport.write('Other player has left. Disconnecting.\n')
-                self.conns[0].transport.loseConnection()
+            # if self.conns:
+            #   self.conns[0].transport.loseConnection()
 
     def dataReceived(self, data):
         self.queue.put(data)
