@@ -14,7 +14,7 @@ class Snake(pygame.sprite.Sprite):
         self.score = 0
 
         self.delay = 0
-        self.pause = 3
+        self.pause = 4
 
         self.speed = 1
         self.x_modifier = self.speed
@@ -24,15 +24,15 @@ class Snake(pygame.sprite.Sprite):
    
     def tick(self, gs):
         #update position
-        if (self.message != ''):
-            self.parse_message(self.message) 
-            self.message = ''
-        else:
-            if (self.delay == 0):
-                self.x += self.y_modifier 
-                self.y += self.x_modifier
+        #if (self.message != ''):
+        #    self.parse_message(self.message) 
+        #    self.message = ''
 
-            self.delay = (self.delay + 1) % self.pause
+        if (self.delay == 0):
+            self.x += self.y_modifier 
+            self.y += self.x_modifier
+
+        self.delay = (self.delay + 1) % self.pause
 
     def move_up(self):
         self.send_move_location('up', self.x, self.y)
@@ -94,23 +94,36 @@ class Snake(pygame.sprite.Sprite):
     def receive_move_location(self, message, data):
         self.message = message
         self.data = data
+        self.parse_message(message)
 
     def parse_message(self, message):
-        message = message.split(',')[-1]
+        message = message.split(',')[-2]
         spl = message.split(" ")
 
         turn_point = (int(spl[1]), int(spl[2]))
         adjust = 0
-                
-        for i in self.path[::-1]:
-            if i[0] != turn_point[0] and i[1] != turn_point[1]:
-                self.path.remove(i)
-                adjust += 1
+        self.data[turn_point[0]][turn_point[1]] = Box.EMPTY
+
+        to_remove = []                
+        adj_path = []
+        delete = False
+
+        for i in self.path:
+            if delete:
                 self.data[i[0]][i[1]] = Box.EMPTY
+                continue
+            
+            if not (i[0] == turn_point[0] and i[1] == turn_point[1]):
+                adj_path.append(i)
             else:
-                break
+                adj_path.append(i)
+                delete = True
+
+        self.path = adj_path
         self.x = turn_point[0]
         self.y = turn_point[1]
+
+        self.data[self.x][self.y] = Box.ENEMY_PATH
                 
         move = spl[0]
         for _ in range(adjust):
@@ -122,7 +135,8 @@ class Snake(pygame.sprite.Sprite):
                 self.x += 1
             elif move == 'right':
                 self.x -= 1
-    
+
+            self.path.append((self.x, self.y))
             self.data[self.x][self.y] = Box.ENEMY_PATH
 
         if move == 'up':

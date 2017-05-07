@@ -49,9 +49,9 @@ class ClientConnection(Protocol):
             print('connection lost')
             print('number of connections: {}'.format(len(self.conns)))
 
-            # remove the other connection if there is one
-            # if self.conns:
-            #   self.conns[0].transport.loseConnection()
+            # notify the other connection if there is one
+            if self.conns:
+               self.conns[0].transport.write('connection lost')
 
     def dataReceived(self, data):
         self.queue.put(data)
