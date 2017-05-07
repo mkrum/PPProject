@@ -4,13 +4,13 @@ from threading import Thread
 from snake import Snake
 from gamegrid import Grid, Box
 from twisted.internet import reactor
-import time
 
 class GameSpace:
 
     def main(self):
         # part one
         self.started = False
+        self.finished = False
         
         pygame.init()
         self.size = self.width, self.height = 600, 600 
@@ -38,15 +38,8 @@ class GameSpace:
         self.mono = pygame.font.SysFont("monospace", 15)     
 
         # part two
-        if (self.num):
-            self.player = Snake(self, 0, 0, self.box_size)
-            self.opponent = Snake(self, 10, 10, self.box_size)
-        else:
-            self.player = Snake(self, 10, 10, self.box_size)
-            self.opponent = Snake(self, 0, 0, self.box_size)
 
         self.grid = Grid(self, self.grid_size, self.grid_size)
-        # self.connection = Connection(self.grid)
         self.clock = pygame.time.Clock()
 
         # draw initial screen
@@ -60,15 +53,27 @@ class GameSpace:
             self.screen.blit(text, textpos)
             pygame.display.flip()
 
+    def set_players(self, num):
+        if (int(num)):
+            self.player = Snake(self, 0, 0, self.box_size)
+            self.opponent = Snake(self, 10, 10, self.box_size)
+        else:
+            self.player = Snake(self, 10, 10, self.box_size)
+            self.opponent = Snake(self, 0, 0, self.box_size)
+
+        self.player.sync = True
 
     def game_space_tick(self):
         # part three
         # self.clock.tick(60)
 
-        if not self.started:
+        if not self.started or self.finished:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    sys.exit(1)
+                    reactor.stop()
+                
+                if event.type == pygame.MOUSEBUTTONDOWN and self.finished:
+                    reactor.stop()
             return
 
         self.player.tick(self)
@@ -93,7 +98,9 @@ class GameSpace:
 
                 if event.key == ord("a"):
                     self.player.move_left()
-
+        
+        if self.finished:
+            return
 
         self.screen.fill(self.black)
 
@@ -140,28 +147,25 @@ class GameSpace:
         else:
             self.y_offset = y - self.boxes_per_row/2
 
-    def game_over_screen(self):
-        #self.connection.hey_I_died()
-
+    def game_over_screen(self, me, opp):
+        self.connection.update(opp)
+        self.finished = True
         font = pygame.font.Font(None, 36)
-        text = font.render('Game Over', 1, (255, 10, 10))
+        text = font.render('Game Over - You {}!'.format(me), 1, (255, 10, 10))
         textpos = text.get_rect(centerx=int(self.width/2),
                                 centery=int(self.height/2))
         self.screen.blit(text, textpos)
         pygame.display.flip()
-        time.sleep(3)
-        reactor.stop()
 
     def win_screen(self):
+        self.connection.update('lose')
+        self.finished = True
         font = pygame.font.Font(None, 36)
-        text = font.render('You Win!', 1, (255, 10, 10))
+        text = font.render('Game Over - You Win!', 1, (255, 10, 10))
         textpos = text.get_rect(centerx=int(self.width/2),
                                 centery=int(self.height/2))
         self.screen.blit(text, textpos)
         pygame.display.flip()
-        time.sleep(3)
-        reactor.stop()
 
     def kill_other_snake(self):
         self.win_screen()
-        #self.connection.kill() or something

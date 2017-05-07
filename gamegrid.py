@@ -8,6 +8,7 @@ class Box():
     PATH = 2
     ENEMY_PATH = 3
     ENEMY = 4
+    ENEMY_MARKED = 5
 
 class Grid(pygame.sprite.Sprite):
 
@@ -19,7 +20,6 @@ class Grid(pygame.sprite.Sprite):
         
         self.data = [ [] for _ in xrange(N_height) ]
 
-        self.snake_path = []
         
         for i in range(self.height):
             for j in range(self.width):
@@ -27,91 +27,97 @@ class Grid(pygame.sprite.Sprite):
                 self.data[i].append(Box.EMPTY)
                 if(i + j < 3):
                     self.data[i][j] = Box.MARKED
-        self.old_i = 0
-        self.old_j = 0
+
+        self.old_i = {}
+        self.old_j = {}
    
 
-    def tick(self, gs):
+    def tick(self, gs, snake, path_value, marked_value, enemy_path_value):
         #mark the spot of the current snake
 
-        i = gs.player.x
-        j = gs.player.y
+        i = snake.x
+        j = snake.y
 
-        if i == self.old_i and j == self.old_j:
-            return
+        try:
+            if i == self.old_i[snake] and j == self.old_j[snake]:
+                return
+        except:
+            self.old_i[snake] = i
+            self.old_j[snake] = j
 
-        if(self.data[i][j] == Box.MARKED):
-            self.snake_path.append([i, j])
-            if (len(self.snake_path) > 1):
-                self.fill_path(gs)
-            self.snake_path = []
+        if(self.data[i][j] == marked_value):
+            snake.path.append([i, j])
+            if (len(snake.path) > 1):
+                self.fill_path(gs, snake.path, marked_value)
+            snake.path = []
 
         #check if you hit your own path
-        elif (self.data[i][j] == Box.PATH):
-            gs.game_over_screen()
-        elif (self.data[i][j] == Box.ENEMY_PATH):
-            gs.kill_other_snake()
+        elif (self.data[i][j] == path_value):
+            # gs.game_over_screen('lose')
+            pass
+        elif (self.data[i][j] == enemy_path_value):
+            gs.game_over_screen('win', 'lose')
         #check bounds
         elif (i < 0 or j < 0 or i > gs.grid_size or j > gs.grid_size):
-            gs.game_over_screen()
+            gs.game_over_screen('lose', 'win')
         else:
-            self.data[i][j] = Box.PATH
+            self.data[i][j] = path_value
             # gs.connection.update(i, j, Box.PATH)
-            self.snake_path.append([i, j])
+            snake.path.append([i, j])
 
-        self.old_i = i
-        self.old_j = j
+        self.old_i[snake] = i
+        self.old_j[snake] = j
         
 
     #there must be a better way to do this
-    def fill_path(self, gs):
+    def fill_path(self, gs, snake_path, marked_value):
         
-        if (len(self.snake_path) < 2):
+        if (len(snake_path) < 2):
             return 
 
         #track total change in score so its only a single message
 
         #complete right angle
-        end = list(self.snake_path[-1])
+        end = list(snake_path[-1])
 
         #Check if the beginning and end is parallel
-        dx = self.snake_path[0][0] - self.snake_path[1][0]
-        dy = self.snake_path[0][1] - self.snake_path[1][1]
+        dx = snake_path[0][0] - snake_path[1][0]
+        dy = snake_path[0][1] - snake_path[1][1]
         
-        move = list(self.snake_path[0])
+        move = list(snake_path[0])
         
         move[0] += dx
         move[1] += dy
         new_point = list(move)
-        self.snake_path.append(new_point)
-        add_points = self.find_path(new_point, end)
+        snake_path.append(new_point)
+        add_points = self.find_path(new_point, end, marked_value)
         
         for p in add_points:
-            self.snake_path.append(p)
+            snake_path.append(p)
 
-        self.i_ranges = {}
-        self.j_ranges = {}
+        i_ranges = {}
+        j_ranges = {}
 
-        for (i, j) in self.snake_path:
+        for (i, j) in snake_path:
 
             #check if its a new block, if so, increment score
             if (self.data[i][j] != Box.MARKED):
                 gs.player.score += 1
 
-            self.data[i][j] = Box.MARKED
+            self.data[i][j] = marked_value
             # gs.connection.update(i, j, Box.MARKED)
 
             try:
-                self.i_ranges[i].append(j)
-                self.j_ranges[j].append(i)
+                i_ranges[i].append(j)
+                j_ranges[j].append(i)
             except:
-                self.i_ranges[i] = [j]
-                self.j_ranges[j] = [i]
+                i_ranges[i] = [j]
+                j_ranges[j] = [i]
 
 
 
-        for k in self.i_ranges.keys():
-            l = sorted(self.i_ranges[k])
+        for k in i_ranges.keys():
+            l = sorted(i_ranges[k])
             
             new_list = []
             for i in range(len(l)):
@@ -123,10 +129,10 @@ class Grid(pygame.sprite.Sprite):
 
                 new_list.append(l[i])
 
-            self.i_ranges[k] = sorted(new_list)
+            i_ranges[k] = sorted(new_list)
         
-        for k in self.j_ranges.keys():
-            l = sorted(self.j_ranges[k])
+        for k in j_ranges.keys():
+            l = sorted(j_ranges[k])
             new_list = []
             for i in range(len(l)):
                 #get points right next to each other
@@ -137,21 +143,21 @@ class Grid(pygame.sprite.Sprite):
 
                 new_list.append(l[i])
 
-            self.j_ranges[k] = sorted(new_list)
+            j_ranges[k] = sorted(new_list)
         
-        for i in self.i_ranges.keys():
-            for j in self.j_ranges.keys():
+        for i in i_ranges.keys():
+            for j in j_ranges.keys():
 
-                for k in range(len(self.i_ranges[i]) - 1):
-                    if (j > self.i_ranges[i][k] and j < self.i_ranges[i][ k + 1 ]):
+                for k in range(len(i_ranges[i]) - 1):
+                    if (j > i_ranges[i][k] and j < i_ranges[i][ k + 1 ]):
                         if (self.data[i][j] == Box.EMPTY):
-                            self.fill_shape((i, j), self.snake_path, gs) 
+                            self.fill_shape((i, j), snake_path, gs, marked_value) 
                             return
 
-                for k in range(len(self.j_ranges[j]) - 1):
-                    if (i > self.j_ranges[j][k] and i < self.j_ranges[j][ k + 1 ]):
+                for k in range(len(j_ranges[j]) - 1):
+                    if (i > j_ranges[j][k] and i < j_ranges[j][ k + 1 ]):
                         if (self.data[i][j] == Box.EMPTY):
-                            self.fill_shape((i, j), self.snake_path) 
+                            self.fill_shape((i, j), snake_path, marked_value) 
                             return
 
     def get_valid_edges(self, p1, visited, box_type):
@@ -173,7 +179,7 @@ class Grid(pygame.sprite.Sprite):
         return edges
 
     #modified Dijkstra
-    def find_path(self, start, end):
+    def find_path(self, start, end, marked_value):
 
         dist = dict()
         previous = dict()
@@ -196,7 +202,7 @@ class Grid(pygame.sprite.Sprite):
             if current[0] == end[0] and current[1] == end[1]:
                 return self.build_path(previous, end)
 
-            for edge in self.get_valid_edges(current, visited, Box.MARKED):
+            for edge in self.get_valid_edges(current, visited, marked_value):
                 newDist = dist[(current[0], current[1])] + 1
 
                 try:
@@ -219,7 +225,7 @@ class Grid(pygame.sprite.Sprite):
 
         return points
 
-    def fill_shape(self, point, path, gs):
+    def fill_shape(self, point, path, gs, marked_value):
         q = Queue()
         visited = set()
         q.put(point)
@@ -227,10 +233,10 @@ class Grid(pygame.sprite.Sprite):
         while not q.empty():
             current = q.get()
 
-            if (self.data[current[0]][current[1]] != Box.MARKED):
+            if (self.data[current[0]][current[1]] != marked_value):
                 gs.player.score += 1
 
-            self.data[current[0]][current[1]] = Box.MARKED
+            self.data[current[0]][current[1]] = marked_value 
             # gs.connection.update(current[0], current[1], Box.MARKED)
             
             for adj in self.get_valid_edges(current, visited, Box.EMPTY):

@@ -30,11 +30,14 @@ class ClientConnection(Protocol):
     def forwardData(self, data):
         if 'start the game' in data:
             _, num = data.split(',', 1)
+            self.gs.set_players(num)
             self.gs.started = True
-            self.gs.num = num
         elif self.gs.started:
             print('data: {}'.format(data))
-            self.gs.opponent.receive_move(data)
+            if 'win' in data or 'lose' in data:
+                self.gs.game_over_screen(data)
+            else:
+                self.gs.opponent.receive_move_location(data, gs.grid.data)
         self.queue.get().addCallback(self.forwardData)
 
     def startForwarding(self):
@@ -60,10 +63,10 @@ def errorHandler(reason):
 if __name__ == '__main__':
     gs = GameSpace()
     gs.main()
-
+        
     gs_tick = LoopingCall(gs.game_space_tick)
     gs_tick.start((1.0/60.0)).addErrback(errorHandler)
 
     clientConnFactory = ClientConnectionFactory(gs)
-    reactor.connectTCP("newt.campus.nd.edu", 40067, clientConnFactory)
+    reactor.connectTCP("newt.campus.nd.edu", 40071, clientConnFactory)
     reactor.run()
