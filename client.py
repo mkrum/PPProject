@@ -34,7 +34,7 @@ class ClientConnection(Protocol):
             self.gs.started = True
         elif self.gs.started:
             print('data: {}'.format(data))
-            self.gs.opponent.receive_move_location(data)
+            self.gs.opponent.receive_move_location(data, gs.grid.data)
         self.queue.get().addCallback(self.forwardData)
 
     def startForwarding(self):
