@@ -7,7 +7,8 @@ class Snake(pygame.sprite.Sprite):
     def __init__(self, gs, x, y, size):
         self.x = x
         self.y = y
-
+        self.path = []
+            
         self.gs = gs
 
         self.score = 0
@@ -25,13 +26,11 @@ class Snake(pygame.sprite.Sprite):
         if (self.delay == 0):
             self.x += self.y_modifier 
             self.y += self.x_modifier
-            if self.sync:
-                self.send_location(self.x, self.y)
 
         self.delay = (self.delay + 1) % self.pause
 
     def move_up(self):
-        #self.send_move('up')
+        self.send_move_location('up', self.x, self.y)
         self.up()
 
     def up(self):
@@ -39,7 +38,7 @@ class Snake(pygame.sprite.Sprite):
         self.x_modifier = 0
 
     def move_down(self):
-        #self.send_move('down')
+        self.send_move_location('down', self.x, self.y)
         self.down()
 
     def down(self):
@@ -47,7 +46,7 @@ class Snake(pygame.sprite.Sprite):
         self.x_modifier = 0
 
     def move_right(self):
-        #self.send_move('right')
+        self.send_move_location('right', self.x, self.y)
         self.right()
 
     def right(self):
@@ -55,7 +54,7 @@ class Snake(pygame.sprite.Sprite):
         self.y_modifier = 0
 
     def move_left(self):
-        #self.send_move('left')
+        self.send_move_location('left', self.x, self.y)
         self.left()
 
     def left(self):
@@ -76,9 +75,50 @@ class Snake(pygame.sprite.Sprite):
             self.right()
 
     def send_location(self, i, j):
+        self.gs.connection.transport.setTcpNoDelay(True)
         self.gs.connection.update("%s %s" % (str(i), str(j)))
         
     def receive_location(self, loc):
         spl = loc.split(" ")
         self.y = int(spl[1])
         self.x = int(spl[0])
+
+    def send_move_location(self, move, i, j):
+        self.gs.connection.update(move + " %s %s" % (str(i), str(j)))
+
+    def receive_move_location(self, message):
+        spl = message.split(" ")
+
+        move = spl[0]
+        if move == 'up':
+            self.up()
+        elif move == 'down':
+            self.down()
+        elif move == 'left':
+            self.left()
+        elif move == 'right':
+            self.right()
+        
+        turn_point = (int(spl[1]), int(spl[2]))
+        adjust = 0
+
+        for i in self.path[::-1]:
+            if i[0] != turn_point[0] and i[1] != turn_point[1]:
+                self.path.remove(i)
+                adjust += 1
+                #somehow reset the data to empty
+            else:
+                break
+        
+        self.x = turn_point[0]
+        self.y = turn_point[1]
+
+        if move == 'up':
+            self.y -= adjust
+        elif move == 'down':
+            self.y += adjust
+        elif move == 'left':
+            self.x += adjust
+        elif move == 'right':
+            self.x -= adjust
+
