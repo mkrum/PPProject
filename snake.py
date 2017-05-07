@@ -5,20 +5,22 @@ from gamegrid import Box
 class Snake(pygame.sprite.Sprite):
 
     def __init__(self, gs, x, y, size):
+        # the location and path of the snake
         self.x = x
         self.y = y
         self.path = []
             
         self.gs = gs
-
         self.score = 0
-
+        
+        # control how quickly snake moves
+        # if the snake is too fast, it is hard to control
         self.delay = 0
         self.pause = 4
-
         self.speed = 1
         self.x_modifier = self.speed
         self.y_modifier = 0
+
         self.sync = False
         self.message = ''
    
@@ -33,6 +35,9 @@ class Snake(pygame.sprite.Sprite):
             self.y += self.x_modifier
 
         self.delay = (self.delay + 1) % self.pause
+
+    # helper functions to handle moving the snake and
+    # updating its location in the other client
 
     def move_up(self):
         self.send_move_location('up', self.x, self.y)
@@ -65,7 +70,8 @@ class Snake(pygame.sprite.Sprite):
     def left(self):
         self.x_modifier = -1 * self.speed
         self.y_modifier = 0
-
+    
+    '''
     def send_move(self, move):
         self.gs.connection.update(move)
 
@@ -81,21 +87,24 @@ class Snake(pygame.sprite.Sprite):
 
     def send_location(self, i, j):
         self.gs.connection.transport.setTcpNoDelay(True)
-        self.gs.connection.update("%s %s" % (str(i), str(j)))
+        self.gs.connection.update('{} {}'.format(str(i), str(j)))
         
     def receive_location(self, loc):
         spl = loc.split(" ")
         self.y = int(spl[1])
         self.x = int(spl[0])
-
+    '''
+    # send this player's move and position to the other client
     def send_move_location(self, move, i, j):
-        self.gs.connection.update(move + " %s %s," % (str(i), str(j)))
+        self.gs.connection.update('{} {} {},'.format(move, str(i), str(j)))
 
+    # receive the opponent's move and position
     def receive_move_location(self, message, data):
         self.message = message
         self.data = data
         self.parse_message(message)
 
+    # update the opponent's position and path
     def parse_message(self, message):
         message = message.split(',')[-2]
         spl = message.split(" ")

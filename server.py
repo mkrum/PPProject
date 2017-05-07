@@ -19,7 +19,7 @@ class ClientConnection(Protocol):
         self.startForwarding()
         self.conns = conns
 
-
+    # client has connected to server
     def connectionMade(self):
         # limit the number of client connections to 2
         if len(self.conns) >= 2:
@@ -50,6 +50,7 @@ class ClientConnection(Protocol):
             print('number of connections: {}'.format(len(self.conns)))
 
             # notify the other connection if there is one
+            # that their opponent left
             if self.conns:
                self.conns[0].transport.write('connection lost')
 
@@ -77,7 +78,7 @@ class ClientConnectionFactory(ClientFactory):
     def buildProtocol(self, addr):
         return ClientConnection(self.conns)
 
-
+# start listening on port 40067
 clientFactory = ClientConnectionFactory()
 reactor.listenTCP(40067, clientFactory)
 

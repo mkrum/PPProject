@@ -18,33 +18,50 @@ class ClientConnection(Protocol):
         self.gs.connection = self
         self.startForwarding()
 
+    # player has joined the game
     def connectionMade(self):
         print('client connection made')
     
-    def update(self, move):
-        self.transport.write('{}'.format(move))
+    # send update over connection
+    def update(self, data):
+        self.transport.write('{}'.format(str(data)))
 
+    # put the data on the queue
     def dataReceived(self, data):
         self.queue.put(data)
 
+    # handle the data that was received
     def forwardData(self, data):
         if 'start the game' in data:
+            # set which connection is which player and start the game
             _, num = data.split(',', 1)
             self.gs.set_players(num)
             self.gs.started = True
         elif self.gs.started:
             print('data: {}'.format(data))
-            if 'win' in data or 'lose' in data:
-                self.gs.text_screen('Game Over - You {}! Click to quit.'.format(data))
+            # this player won
+            if 'win' in data:
+                self.gs.text_screen('Game Over - You Win! Click to quit.'.format(data))
+
+            # this player lost
+            elif 'lose' in data:
+                self.gs.text_screen('Game Over - You Lose! Click to quit.'.format(data))
+
+            # other player disconnected
             elif 'connection lost' in data:
                 self.gs.text_screen('Other player has left. Click to quit.')
-            else:
+
+            # a move has been sent, update oppenent's position
+            elif 'up' in data or 'down' in data or 'left' in data or 'right' in data:
                 self.gs.opponent.receive_move_location(data, gs.grid.data)
+        # re-add itself as callback
         self.queue.get().addCallback(self.forwardData)
 
+    # add the callback to the deferred queue
     def startForwarding(self):
         self.queue.get().addCallback(self.forwardData)
 
+    # stop running when the connection is lost
     def connectionLost(self, reason):
         if reactor.running:
             reactor.stop()
@@ -57,18 +74,24 @@ class ClientConnectionFactory(ClientFactory):
     def buildProtocol(self, addr):
         return self.conn
 
+# quit on errors
 def errorHandler(reason):
     print(reason)
     if reactor.running:
         reactor.stop()
 
 if __name__ == '__main__':
+    # initialize gamespace
     gs = GameSpace()
     gs.main()
-        
+    
+    # run game_space_tick at 60 fps
+    # http://stackoverflow.com/questions/8381850/combining-pygame-and-twisted
+    # this is an alternative to using clock.tick(60) in pygame
     gs_tick = LoopingCall(gs.game_space_tick)
     gs_tick.start((1.0/60.0)).addErrback(errorHandler)
 
+    # connect to server
     clientConnFactory = ClientConnectionFactory(gs)
     reactor.connectTCP("newt.campus.nd.edu", 40067, clientConnFactory)
     reactor.run()

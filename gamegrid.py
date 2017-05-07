@@ -2,6 +2,7 @@ import pygame
 from math import sin, cos, radians
 from Queue import Queue
 
+# enum for different options for Box type
 class Box():
     EMPTY = 0
     MARKED = 1
@@ -68,8 +69,9 @@ class Grid(pygame.sprite.Sprite):
         self.old_i[snake] = i
         self.old_j[snake] = j
         
-
-    #there must be a better way to do this
+    # when a snake makes it back to its own squares,
+    # fill the area formed by the path
+    # there must be a better way to do this
     def fill_path(self, gs, snake_path, marked_value):
         
         if (len(snake_path) < 2):
@@ -119,7 +121,7 @@ class Grid(pygame.sprite.Sprite):
             
             new_list = []
             for i in range(len(l)):
-                #get points right next to each other
+                # get points right next to each other
                 if i < len(l) - 1 and abs(l[i] - l[i + 1]) == 1:
                     continue
                 if i > 0 and abs(l[i] - l[i - 1]) == 1:
@@ -133,7 +135,7 @@ class Grid(pygame.sprite.Sprite):
             l = sorted(j_ranges[k])
             new_list = []
             for i in range(len(l)):
-                #get points right next to each other
+                # get points right next to each other
                 if i < len(l) - 1 and abs(l[i] - l[i + 1]) == 1:
                     continue
                 if i > 0 and abs(l[i] - l[i - 1]) == 1:
@@ -176,7 +178,7 @@ class Grid(pygame.sprite.Sprite):
 
         return edges
 
-    #modified Dijkstra
+    # modified Dijkstra
     def find_path(self, start, end, marked_value):
 
         dist = dict()
