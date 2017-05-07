@@ -147,11 +147,11 @@ class GameSpace:
         else:
             self.y_offset = y - self.boxes_per_row/2
 
-    def game_over_screen(self, result):
-        self.connection.update(result)
+    def game_over_screen(self, me, opp):
+        self.connection.update(opp)
         self.finished = True
         font = pygame.font.Font(None, 36)
-        text = font.render('Game Over - You {}!'.format(result), 1, (255, 10, 10))
+        text = font.render('Game Over - You {}!'.format(me), 1, (255, 10, 10))
         textpos = text.get_rect(centerx=int(self.width/2),
                                 centery=int(self.height/2))
         self.screen.blit(text, textpos)

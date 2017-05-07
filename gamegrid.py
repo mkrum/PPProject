@@ -56,10 +56,10 @@ class Grid(pygame.sprite.Sprite):
             # gs.game_over_screen('lose')
             pass
         elif (self.data[i][j] == enemy_path_value):
-            gs.game_over_screen('win')
+            gs.game_over_screen('win', 'lose')
         #check bounds
         elif (i < 0 or j < 0 or i > gs.grid_size or j > gs.grid_size):
-            gs.game_over_screen('lose')
+            gs.game_over_screen('lose', 'win')
         else:
             self.data[i][j] = path_value
             # gs.connection.update(i, j, Box.PATH)
