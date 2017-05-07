@@ -53,7 +53,8 @@ class Grid(pygame.sprite.Sprite):
 
         #check if you hit your own path
         elif (self.data[i][j] == path_value):
-            gs.game_over_screen('lose')
+            # gs.game_over_screen('lose')
+            pass
         elif (self.data[i][j] == enemy_path_value):
             gs.game_over_screen('win')
         #check bounds
