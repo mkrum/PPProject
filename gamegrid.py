@@ -157,7 +157,7 @@ class Grid(pygame.sprite.Sprite):
                 for k in range(len(j_ranges[j]) - 1):
                     if (i > j_ranges[j][k] and i < j_ranges[j][ k + 1 ]):
                         if (self.data[i][j] == Box.EMPTY):
-                            self.fill_shape((i, j), snake_path, marked_value) 
+                            self.fill_shape((i, j), snake_path, gs, marked_value) 
                             return
 
     def get_valid_edges(self, p1, visited, box_type):
@@ -237,7 +237,6 @@ class Grid(pygame.sprite.Sprite):
                 gs.player.score += 1
 
             self.data[current[0]][current[1]] = marked_value 
-            # gs.connection.update(current[0], current[1], Box.MARKED)
             
             for adj in self.get_valid_edges(current, visited, Box.EMPTY):
                 q.put(adj)

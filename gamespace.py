@@ -59,7 +59,7 @@ class GameSpace:
             self.opponent = Snake(self, 310, 310, self.box_size)
             
             for i in range(10):
-                for j in range(10);
+                for j in range(10):
                     self.grid.data[305 + i][305 + j] = Box.ENEMY_MARKED
                     self.grid.data[285 + i][285 + j] = Box.MARKED
                     
@@ -69,7 +69,7 @@ class GameSpace:
             self.opponent = Snake(self, 290, 290, self.box_size)
 
             for i in range(10):
-                for j in range(10);
+                for j in range(10):
                     self.grid.data[305 + i][305 + j] = Box.MARKED
                     self.grid.data[285 + i][285 + j] = Box.ENEMY_MARKED
 
