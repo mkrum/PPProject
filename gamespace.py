@@ -55,13 +55,24 @@ class GameSpace:
 
     def set_players(self, num):
         if (int(num)):
-            self.player = Snake(self, 0, 0, self.box_size)
-            self.opponent = Snake(self, 10, 10, self.box_size)
-        else:
-            self.player = Snake(self, 10, 10, self.box_size)
-            self.opponent = Snake(self, 0, 0, self.box_size)
+            self.player = Snake(self, 290, 290, self.box_size)
+            self.opponent = Snake(self, 310, 310, self.box_size)
+            
+            for i in range(10):
+                for j in range(10);
+                    self.grid.data[305 + i][305 + j] = Box.ENEMY_MARKED
+                    self.grid.data[285 + i][285 + j] = Box.MARKED
+                    
 
-        self.player.sync = True
+        else:
+            self.player = Snake(self, 310, 310, self.box_size)
+            self.opponent = Snake(self, 290, 290, self.box_size)
+
+            for i in range(10):
+                for j in range(10);
+                    self.grid.data[305 + i][305 + j] = Box.MARKED
+                    self.grid.data[285 + i][285 + j] = Box.ENEMY_MARKED
+
 
     def game_space_tick(self):
         # part three
