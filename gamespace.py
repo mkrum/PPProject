@@ -11,6 +11,7 @@ class GameSpace:
     def main(self):
         # part one
         self.started = False
+        self.finished = False
         
         pygame.init()
         self.size = self.width, self.height = 600, 600 
@@ -68,7 +69,7 @@ class GameSpace:
         # part three
         # self.clock.tick(60)
 
-        if not self.started:
+        if not self.started or self.finished:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     sys.exit(1)
@@ -96,6 +97,10 @@ class GameSpace:
 
                 if event.key == ord("a"):
                     self.player.move_left()
+
+            if event.type == pygame.MOUSEBUTTONDOWN and self.finished:
+                reactor.stop()
+
 
 
         self.screen.fill(self.black)
@@ -145,25 +150,22 @@ class GameSpace:
 
     def game_over_screen(self):
         #self.connection.hey_I_died()
-
+        self.finished = True
         font = pygame.font.Font(None, 36)
         text = font.render('Game Over', 1, (255, 10, 10))
         textpos = text.get_rect(centerx=int(self.width/2),
                                 centery=int(self.height/2))
         self.screen.blit(text, textpos)
         pygame.display.flip()
-        time.sleep(3)
-        reactor.stop()
 
     def win_screen(self):
+        self.finished = True
         font = pygame.font.Font(None, 36)
         text = font.render('You Win!', 1, (255, 10, 10))
         textpos = text.get_rect(centerx=int(self.width/2),
                                 centery=int(self.height/2))
         self.screen.blit(text, textpos)
         pygame.display.flip()
-        time.sleep(3)
-        reactor.stop()
 
     def kill_other_snake(self):
         self.win_screen()
