@@ -16,7 +16,7 @@ If you run into your own path, you lose. If you run into your opponent's path, y
 
 ## Set up
 
-The code for the game can be found at https://github.com/mkrum/PPProject.
+The code for the game can be found at https://github.com/mkrum/PPProject/tree/master/area-game.
 
 This game is made for Python 2.7.13 and Twisted 16.6. The server code is set to be run on newt.campus.nd.edu. Copy the code to newt and then run `python server.py`. This sets up the game server on port 40067.
 

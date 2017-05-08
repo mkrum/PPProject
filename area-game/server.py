@@ -66,8 +66,9 @@ class ClientConnection(Protocol):
     
     def writeOther(self, data):
         # 0 writes to 1 and 1 writes to 0
-        other = 0 if self.num else 1
-        self.conns[other].transport.write(data)
+        if len(self.conns) == 2:
+            other = 0 if self.num else 1
+            self.conns[other].transport.write(data)
 
 
 class ClientConnectionFactory(ClientFactory):

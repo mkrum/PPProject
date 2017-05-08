@@ -76,7 +76,7 @@ class ClientConnectionFactory(ClientFactory):
 
 # quit on errors
 def errorHandler(reason):
-    print(reason)
+    # print(reason)
     if reactor.running:
         reactor.stop()
 
