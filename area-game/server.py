@@ -52,7 +52,7 @@ class ClientConnection(Protocol):
             # notify the other connection if there is one
             # that their opponent left
             if self.conns:
-               self.conns[0].transport.write('connection lost')
+                self.conns[0].transport.write('connection lost')
 
     def dataReceived(self, data):
         self.queue.put(data)

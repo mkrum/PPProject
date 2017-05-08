@@ -6,7 +6,7 @@ Daniel Kerrigan (dkerriga)
 
 ## Gameplay
 
-Our game is inspired bylight cycle from Tron.
+Our game is inspired by light cycle from Tron.
 
 Your player is a square that you can move up, down, left, and right on a grid. Use 'w' to go up, 's' to go down, 'a' to go left, and 'd' to go right. You are the green square. As you move, a red path is formed behind you.
 
