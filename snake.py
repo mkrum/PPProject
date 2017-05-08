@@ -4,19 +4,20 @@ from gamegrid import Box
 
 class Snake(pygame.sprite.Sprite):
 
-    def __init__(self, gs, x, y, size):
+    def __init__(self, gs, x, y, size, num):
+        self.num = num
         # the location and path of the snake
         self.x = x
         self.y = y
         self.path = []
             
         self.gs = gs
-        self.score = 0
+        # start out with a 10x10 block
+        self.score = 100
         
         # control how quickly snake moves
-        # if the snake is too fast, it is hard to control
         self.delay = 0
-        self.pause = 4
+        self.pause = 2
         self.speed = 1
         self.x_modifier = self.speed
         self.y_modifier = 0
@@ -29,7 +30,10 @@ class Snake(pygame.sprite.Sprite):
         #if (self.message != ''):
         #    self.parse_message(self.message) 
         #    self.message = ''
-
+        if self.num == 0 and self.score >= gs.winning_score:
+            gs.connection.update('lose')
+            gs.game_over_screen('win')
+            print('you won by reaching winning score')
         if (self.delay == 0):
             self.x += self.y_modifier 
             self.y += self.x_modifier
@@ -71,29 +75,6 @@ class Snake(pygame.sprite.Sprite):
         self.x_modifier = -1 * self.speed
         self.y_modifier = 0
     
-    '''
-    def send_move(self, move):
-        self.gs.connection.update(move)
-
-    def receive_move(self, move):
-        if move == 'up':
-            self.up()
-        elif move == 'down':
-            self.down()
-        elif move == 'left':
-            self.left()
-        elif move == 'right':
-            self.right()
-
-    def send_location(self, i, j):
-        self.gs.connection.transport.setTcpNoDelay(True)
-        self.gs.connection.update('{} {}'.format(str(i), str(j)))
-        
-    def receive_location(self, loc):
-        spl = loc.split(" ")
-        self.y = int(spl[1])
-        self.x = int(spl[0])
-    '''
     # send this player's move and position to the other client
     def send_move_location(self, move, i, j):
         self.gs.connection.update('{} {} {},'.format(move, str(i), str(j)))

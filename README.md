@@ -12,7 +12,7 @@ Your player is a square that you can move up, down, left, and right on a grid. U
 
 Your opponent will be doing the same thing, although their blocks and paths will appear in black on your screen.
 
-If you run into your own path, you lose. If you run into your opponent's path, you win. If you fill in 1000 blocks, you win.
+If you run into your own path, you lose. If you run into your opponent's path, you win. If you fill in 1000 blocks, you win. If you move out of bounds, you lose. You can tell when you are approaching the boundary when your leading square stops being centered in the screen.
 
 ## Set up
 

@@ -41,11 +41,11 @@ class ClientConnection(Protocol):
             print('data: {}'.format(data))
             # this player won
             if 'win' in data:
-                self.gs.text_screen('Game Over - You Win! Click to quit.'.format(data))
+                self.gs.game_over_screen('win')
 
             # this player lost
             elif 'lose' in data:
-                self.gs.text_screen('Game Over - You Lose! Click to quit.'.format(data))
+                self.gs.game_over_screen('lose')
 
             # other player disconnected
             elif 'connection lost' in data:

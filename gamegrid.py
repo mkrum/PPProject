@@ -24,16 +24,13 @@ class Grid(pygame.sprite.Sprite):
         
         for i in range(self.height):
             for j in range(self.width):
-                #placeholder
                 self.data[i].append(Box.EMPTY)
-                if(i + j < 3):
-                    self.data[i][j] = Box.MARKED
 
         self.old_i = {}
         self.old_j = {}
    
 
-    def tick(self, gs, snake, path_value, marked_value, enemy_path_value):
+    def tick(self, gs, snake, path_value, marked_value, enemy_path_value, enemy_marked):
         #mark the spot of the current snake
 
         i = snake.x
@@ -46,21 +43,33 @@ class Grid(pygame.sprite.Sprite):
             self.old_i[snake] = i
             self.old_j[snake] = j
 
-        if(self.data[i][j] == marked_value):
+        # bug: opponent goes out of bounds of list
+        try:
+            x = self.data[i][j]
+        except:
+            print('i: {} j: {} snake: {}'.format(i, j, snake.num))
+            return
+
+        if self.data[i][j] == marked_value:
             snake.path.append([i, j])
             if (len(snake.path) > 1):
-                self.fill_path(gs, snake.path, marked_value)
+                self.fill_path(gs, snake.path, marked_value, enemy_marked, snake)
             snake.path = []
-
-        #check if you hit your own path
-        elif (self.data[i][j] == path_value):
-            # gs.game_over_screen('lose')
-            pass
-        elif (self.data[i][j] == enemy_path_value):
-            gs.game_over_screen('win', 'lose')
-        #check bounds
-        elif (i < 0 or j < 0 or i > gs.grid_size or j > gs.grid_size):
-            gs.game_over_screen('lose', 'win')
+        # check if you hit your own path.
+        # only check win conditions for player, not for opponent
+        elif (self.data[i][j] == path_value) and snake.num == 0:
+            gs.connection.update('win')
+            gs.game_over_screen('lose')
+            print('you lost by hitting your own path')
+        elif (self.data[i][j] == enemy_path_value) and snake.num == 0:
+            gs.connection.update('lose')
+            gs.game_over_screen('win')
+            print('you won by hitting enemy path')
+        # check bounds - give a slight buffer
+        elif (i <= 2 or j <= 2 or i >= gs.grid_size-2 or j >= gs.grid_size-2) and snake.num == 0:
+            gs.connection.update('win')
+            gs.game_over_screen('lose')
+            print('you lost by going out of bounds')
         else:
             self.data[i][j] = path_value
             # gs.connection.update(i, j, Box.PATH)
@@ -72,7 +81,7 @@ class Grid(pygame.sprite.Sprite):
     # when a snake makes it back to its own squares,
     # fill the area formed by the path
     # there must be a better way to do this
-    def fill_path(self, gs, snake_path, marked_value):
+    def fill_path(self, gs, snake_path, marked_value, enemy_marked, snake):
         
         if (len(snake_path) < 2):
             return 
@@ -90,7 +99,7 @@ class Grid(pygame.sprite.Sprite):
         move[1] += dy
         new_point = list(move)
         snake_path.append(new_point)
-        add_points = self.find_path(new_point, end, marked_value)
+        add_points = self.find_path(new_point, end, marked_value, enemy_marked)
         
         if not add_points:
             return
@@ -103,8 +112,15 @@ class Grid(pygame.sprite.Sprite):
         for (i, j) in snake_path:
 
             #check if its a new block, if so, increment score
-            if (self.data[i][j] != Box.MARKED):
-                gs.player.score += 1
+            if (self.data[i][j] != marked_value):
+                snake.score += 1
+                if self.data[i][j] == enemy_marked:
+                    # deduct the other snake's score
+                    if snake.num == gs.player.num:
+                        opp = gs.opponent
+                    else:
+                        opp = gs.player
+                    opp.score -= 1
 
             self.data[i][j] = marked_value
             # gs.connection.update(i, j, Box.MARKED)
@@ -151,13 +167,15 @@ class Grid(pygame.sprite.Sprite):
                 for k in range(len(i_ranges[i]) - 1):
                     if (j > i_ranges[i][k] and j < i_ranges[i][ k + 1 ]):
                         if (self.data[i][j] == Box.EMPTY):
-                            self.fill_shape((i, j), snake_path, gs, marked_value) 
+                            self.fill_shape((i, j), snake_path, gs,
+                                    marked_value, enemy_marked, snake) 
                             return
 
                 for k in range(len(j_ranges[j]) - 1):
                     if (i > j_ranges[j][k] and i < j_ranges[j][ k + 1 ]):
                         if (self.data[i][j] == Box.EMPTY):
-                            self.fill_shape((i, j), snake_path, gs, marked_value) 
+                            self.fill_shape((i, j), snake_path, gs,
+                                    marked_value, enemy_marked, snake) 
                             return
 
     def get_valid_edges(self, p1, visited, not_box_types):
@@ -179,7 +197,7 @@ class Grid(pygame.sprite.Sprite):
         return edges
 
     # modified Dijkstra
-    def find_path(self, start, end, marked_value):
+    def find_path(self, start, end, marked_value, enemy_marked):
 
         dist = dict()
         previous = dict()
@@ -226,7 +244,7 @@ class Grid(pygame.sprite.Sprite):
 
         return points
 
-    def fill_shape(self, point, path, gs, marked_value):
+    def fill_shape(self, point, path, gs, marked_value, enemy_marked, snake):
         q = Queue()
         visited = set()
         q.put(point)
@@ -235,11 +253,18 @@ class Grid(pygame.sprite.Sprite):
             current = q.get()
 
             if (self.data[current[0]][current[1]] != marked_value):
-                gs.player.score += 1
+                snake.score += 1
+                if self.data[current[0]][current[1]] == enemy_marked:
+                    # deduct the other snake's score
+                    if snake.num == gs.player.num:
+                        opp = gs.opponent
+                    else:
+                        opp = gs.player
+                    opp.score -= 1
 
             self.data[current[0]][current[1]] = marked_value 
             
-            for adj in self.get_valid_edges(current, visited, [Box.MARKED]):
+            for adj in self.get_valid_edges(current, visited, [marked_value]):
                 q.put(adj)
 
     def update(self, i, j, value):

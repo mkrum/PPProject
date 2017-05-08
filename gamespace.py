@@ -8,7 +8,7 @@ class GameSpace:
 
     def main(self):
         # set up game space
-
+    
         # the game has neither started nor finished
         self.started = False
         self.finished = False
@@ -28,6 +28,8 @@ class GameSpace:
         self.box_size = 10
         self.x_offset = 0
         self.y_offset = 0
+
+        self.winning_score = 1000
         
         for i in range(self.boxes_per_row):
             y = i * self.box_size
@@ -56,10 +58,10 @@ class GameSpace:
 
     def set_players(self, num):
         # use num to distinguish between two client connections
-        if (int(num)):
+        if int(num):
             # get the starting snakes
-            self.player = Snake(self, 290, 290, self.box_size)
-            self.opponent = Snake(self, 310, 310, self.box_size)
+            self.player = Snake(self, 290, 290, self.box_size, 0)
+            self.opponent = Snake(self, 310, 310, self.box_size, 1)
             
             # draw the starting squares for each player
             for i in range(10):
@@ -68,8 +70,8 @@ class GameSpace:
                     self.grid.data[285 + i][285 + j] = Box.MARKED
         # do the opposite for the other player
         else:
-            self.player = Snake(self, 310, 310, self.box_size)
-            self.opponent = Snake(self, 290, 290, self.box_size)
+            self.player = Snake(self, 310, 310, self.box_size, 0)
+            self.opponent = Snake(self, 290, 290, self.box_size, 1)
 
             for i in range(10):
                 for j in range(10):
@@ -83,23 +85,32 @@ class GameSpace:
         if not self.started or self.finished:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    reactor.stop()
+                    if reactor.running:
+                        reactor.stop()
                 
                 if event.type == pygame.MOUSEBUTTONDOWN and self.finished:
-                    reactor.stop()
+                    if reactor.running:
+                        reactor.stop()
             return
 
         # call tick on each game object
         self.player.tick(self)
         self.opponent.tick(self)
 
-        self.grid.tick(self, self.player, Box.PATH, Box.MARKED, Box.ENEMY_PATH)
-        self.grid.tick(self, self.opponent, Box.ENEMY_PATH, Box.ENEMY_MARKED, Box.PATH)
+        self.grid.tick(self, self.player, Box.PATH, Box.MARKED,
+                Box.ENEMY_PATH, Box.ENEMY_MARKED)
+        self.grid.tick(self, self.opponent, Box.ENEMY_PATH, Box.ENEMY_MARKED,
+                Box.PATH, Box.MARKED)
 
+        # if the game ended after tick, stop.
+        if self.finished:
+            return
+        
         # handle user input
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                sys.exit(1)
+                if reactor.running:
+                    reactor.stop()
 
             if event.type == pygame.KEYDOWN: 
                 if event.key == ord("s"):
@@ -113,10 +124,6 @@ class GameSpace:
 
                 if event.key == ord("a"):
                     self.player.move_left()
-       
-        # if the game ended after a player moved, stop.
-        if self.finished:
-            return
 
         # update display
         self.screen.fill(self.black)
@@ -139,8 +146,9 @@ class GameSpace:
             pygame.draw.rect(self.screen, (0, 255, 0),
                     self.boxes[self.player.x - self.x_offset][self.player.y - self.y_offset])
 
-            label = self.mono.render('Score: {}'
-                    .format((str(self.player.score))), 1, (255,255,0))
+            label = self.mono.render('Your Score: {}, Opponent Score: {}'
+                    .format(str(self.player.score), str(self.opponent.score)),
+                    1, (255,255,255))
 
             self.screen.blit(label, (10, 10))
         pygame.display.flip()
@@ -165,9 +173,8 @@ class GameSpace:
             self.y_offset = y - self.boxes_per_row/2
 
     # update the other client that the game has ended
-    def game_over_screen(self, me, opp):
-        self.connection.update(opp)
-        self.text_screen('Game Over - You {}! Click to quit.'.format(me))
+    def game_over_screen(self, result):
+        self.text_screen('Game Over - You {}! Click to quit.'.format(result))
 
     # end of game screen: black background, white text in middle
     def text_screen(self, text):
