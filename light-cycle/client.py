@@ -54,6 +54,7 @@ class ClientConnection(Protocol):
             # a move has been sent, update oppenent's position
             elif 'up' in data or 'down' in data or 'left' in data or 'right' in data:
                 self.gs.opponent.receive_move_location(data, gs.grid.data)
+        
         # re-add itself as callback
         self.queue.get().addCallback(self.forwardData)
 

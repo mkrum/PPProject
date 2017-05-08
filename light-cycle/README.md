@@ -16,7 +16,7 @@ A player loses if they run into their own path, their opponent's path, or the ed
 
 ## Set up
 
-The code for the game can be found at https://github.com/mkrum/PPProject in the light-cycle folder.
+The code for the game can be found at https://github.com/mkrum/PPProject/tree/master/light-cycle.
 
 This game is made for Python 2.7.13 and Twisted 16.6. The server code is set to be run on newt.campus.nd.edu. Copy the code in this folder to newt and then run `python server.py`. This sets up the game server on port 40067.
 
