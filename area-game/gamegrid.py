@@ -243,7 +243,7 @@ class Grid(pygame.sprite.Sprite):
                 snake.score += 1
                 if self.data[i][j] == enemy_marked:
                     # deduct the other snake's score
-                    if snake.num == gs.player.num:
+                    if snake.num == self.gs.player.num:
                         opp = gs.opponent
                     else:
                         opp = gs.player
