@@ -20,7 +20,7 @@ The code for the game can be found at https://github.com/mkrum/PPProject/tree/ma
 
 This game is made for Python 2.7.13 and Twisted 16.6. The server code is set to be run on newt.campus.nd.edu. Copy the code in this folder to newt and then run `python server.py`. This sets up the game server on port 40067.
 
-If you want to run the server on a computer other than newt, then edit the line `reactor.connectTCP("newt.campus.nd.edu", 40067, clientConnFactory)` in `client.py`. If you change the port number, then you also must change the port number in the line `reactor.listenTCP(40067, clientFactory)` in `server.py`.
+If you want to run the server on a computer other than newt, then edit the line `reactor.connectTCP("newt.campus.nd.edu", 40067, clientConnFactory)` near the bottom of `client.py`. If you change the port number, then you also must change the port number in the line `reactor.listenTCP(40067, clientFactory)` in `server.py`.
 
 Once the server is running, copy all of the code to whatever computers you want to play the game on. This game is for two players. Once each player has a copy of the code and the correct version of Python, Twisted, and PyGame installed, they can run `python client.py`. This will connect them to the server. The first player that connects will see a waiting screen until the second player connects. Once both players have run `python client.py` and have connected, the game will begin.
 
