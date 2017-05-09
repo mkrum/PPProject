@@ -30,6 +30,7 @@ class Snake(pygame.sprite.Sprite):
         #if (self.message != ''):
         #    self.parse_message(self.message) 
         #    self.message = ''
+        
         if self.num == 0 and self.score >= gs.winning_score:
             gs.connection.update('lose')
             gs.game_over_screen('win')
@@ -83,11 +84,26 @@ class Snake(pygame.sprite.Sprite):
     def receive_move_location(self, message, data):
         self.message = message
         self.data = data
-        self.parse_message(message)
+
+        for m in message.split(","):
+            if m.split(" ")[0] == "draw":
+                points = self.read_draw(m)                
+                self.gs.grid.draw_path(points, 
+                                    Box.ENEMY_MARKED, Box.MARKED,
+                                  self.gs.opponent) 
+            elif len(m) > 1:
+                self.parse_message(m)
+
+    def read_draw(self, m):
+        m = m.split(" ")[1:]
+        points = []
+        for i in range(0, len(m), 2):
+            points.append([int(m[i]), int(m[i + 1])])
+        return points
 
     # update the opponent's position and path
     def parse_message(self, message):
-        message = message.split(',')[-2]
+        
         spl = message.split(" ")
 
         turn_point = (int(spl[1]), int(spl[2]))

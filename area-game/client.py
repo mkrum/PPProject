@@ -21,6 +21,7 @@ class ClientConnection(Protocol):
     # player has joined the game
     def connectionMade(self):
         print('client connection made')
+        self.transport.setTcpNoDelay(True)
     
     # send update over connection
     def update(self, data):
@@ -52,7 +53,7 @@ class ClientConnection(Protocol):
                 self.gs.text_screen('Other player has left. Click to quit.')
 
             # a move has been sent, update oppenent's position
-            elif 'up' in data or 'down' in data or 'left' in data or 'right' in data:
+            elif 'draw' in data or 'up' in data or 'down' in data or 'left' in data or 'right' in data:
                 self.gs.opponent.receive_move_location(data, gs.grid.data)
         # re-add itself as callback
         self.queue.get().addCallback(self.forwardData)
